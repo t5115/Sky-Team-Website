@@ -1,60 +1,56 @@
-<!-- Login Page -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky - Login Page</title>
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="styling/index.css">
+    <title>Sky - Signup</title>
+     <!-- Stylesheets -->
+    <link rel="stylesheet" href="/frontend/main.css">
+    <link rel="stylesheet" href="/frontend/styling/signup.css">
 </head>
 <body>
     
-
     <!--Main Container-->
     <div class="container">
-
-        <!--Container for other half containing image-->
-        <div class="left-container">
-            <img src="assets/login_page/login-man.png">
-        </div>
 
         <!--Container for Login-->
         <div class="login-container">
 
             <div id="logo">
-                <img src="assets//login_page/sky_logo.svg" alt="Sky Logo">
+                <img src="/frontend/assets/login_page/sky_logo.svg" alt="Sky Logo">
             </div>
 
             <div class="info-forms">
-                <h3 id="login-text">Login</h3>
+                <h3 id="login-text">Create account</h3>
+                <input type="name" placeholder="Full Name">
                 <input type="email" placeholder="Email">
                 <input type="password" placeholder="Password">
 
                 <div class="helpers">
                     <label class="remember">
                         <input type="checkbox">
-                        Remember me
+                        I agree to the terms and conditions.
                     </label>
-                    <a href="#">Forgot password</a>
+                   
                 </div>
 
             </div>
 
             <div class="login-button">
-                <button type="submit" onclick="location.href='/frontend/pages/transition.html'">Login</button>
+                <button type="submit">Complete signup</button>
             </div>
 
             <div class="bottom-links">
-                <a href="#">Admin Login</a>
-                <a href="pages/signup.html">Create Account</a>
+                <a href="/frontend/index.html">Already have an account? Log in</a>
             </div>
 
         </div>
 
-      
+         <!--Container for other half containing image-->
+        <div class="right-container">
+            <img src="/frontend/assets/create_account/signup_lady.png">
+        </div>
+
     </div>
 </body>
 </html>

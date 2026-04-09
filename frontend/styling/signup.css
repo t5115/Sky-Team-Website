@@ -56,8 +56,7 @@ a {
 /*Used for small helpers under the password boxes (i.e remember me/forgot pw)*/
 .helpers{
     display: flex;
-    justify-content:space-between;
-    align-items: center;
+    justify-content:center;
     width:100%;
 }
 
@@ -92,23 +91,27 @@ a {
     margin: 8px;
 }
 
-.left-container{
+.right-container{
     flex:1;
     background-color: rgb(167, 4, 167);
     height: 100vh;
    
     display: flex;
+    justify-content: center; 
+    align-items: center;  
    
 }
 
-.left-container img{
+.right-container img{
     width: 80%;
     height: 100%;
     object-fit: cover; 
+    
 }
 
 @media (max-width: 768px) {
-    .left-container {
+    .right-container {
         display: none;
     }
 }
+
