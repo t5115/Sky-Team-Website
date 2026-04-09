@@ -15,6 +15,7 @@ a {
     align-items: center;
     flex-direction: column;
     flex:1;
+    padding: 30px;
 }
 
 /*Centers the image and sizes it*/
@@ -36,8 +37,10 @@ a {
 }
 
 /*Parent width container for forms*/
-.info-forms{
-    width: 550px;
+.info-forms,
+.login-button {
+    width:100%;
+    max-width: 550px;
 }
 
 /*For each form*/
@@ -65,9 +68,6 @@ a {
     white-space: nowrap; 
 }
 
-.login-button{
-    width:550px;
-}
 
 .login-button button{
     width:100%;
@@ -88,7 +88,7 @@ a {
     flex:1;
     background-color: rgb(167, 4, 167);
     height: 100vh;
-
+   
     display: flex;
    
 }
@@ -96,7 +96,7 @@ a {
 .left-container img{
     width: 80%;
     height: 100%;
-    object-fit: cover; /* key property */
+    object-fit: cover; 
   
 }
 
