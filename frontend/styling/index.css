@@ -107,6 +107,7 @@ a {
     object-fit: cover; 
 }
 
+/*Hide the image on smaller screens*/
 @media (max-width: 768px) {
     .left-container {
         display: none;

@@ -21,6 +21,7 @@ body{
     margin-top: 70px;
     color: white;
     font-size: 60px;
+    text-align: center;
 }
 
 /*Controls animation for spinning which plays on page load*/
@@ -40,5 +41,12 @@ body{
     }
     to {
         transform: rotate(360deg);
+    }
+}
+
+/*Make it so that the sky image is bigger on smaller screens*/
+@media (max-width: 768px) {
+    #sky-image {
+        width:40%;
     }
 }

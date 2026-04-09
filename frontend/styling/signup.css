@@ -109,6 +109,7 @@ a {
     
 }
 
+/*Hide the image on smaller screens*/
 @media (max-width: 768px) {
     .right-container {
         display: none;
