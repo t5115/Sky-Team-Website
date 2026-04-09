@@ -1,0 +1,76 @@
+/*Positions the reset password box in the middle*/
+body{
+    background-color:  rgb(167, 4, 167);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*Holds all the content for the page*/
+.main-container{
+    width:60%;
+    height: 100vh;
+    background-color: rgb(252, 252, 252);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#sky-logo{
+    width:30%;
+    margin-top: 80px;
+}
+
+#reset-password-text{
+    margin-top:40px;
+    font-size: 30px;
+ 
+}
+
+#reset-info-text{
+    margin-bottom: 30px;
+
+    padding: 10px;
+}
+
+.login-button {
+    width:60%;
+    max-width: 500px;
+}
+
+/*Styles the email form*/
+input{
+    width: 60%;
+    height: 40px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.login-button button{
+    margin-top:12px;
+    width:100%;
+    padding:22px;
+    background-color: rgb(185, 25, 185);
+    color: white;
+    border: 1px solid rgb(224, 222, 222);
+    border-radius: 9px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#back-to-login{
+     text-decoration: none;
+     margin-top: 20px;
+    
+}
+
+/*Make the main content bigger on smaller screens*/
+@media (max-width: 768px) {
+    .main-container {
+        width:80%;
+    }
+}
