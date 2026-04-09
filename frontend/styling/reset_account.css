@@ -26,12 +26,10 @@ body{
 #reset-password-text{
     margin-top:40px;
     font-size: 30px;
- 
 }
 
 #reset-info-text{
     margin-bottom: 30px;
-
     padding: 10px;
 }
 
@@ -65,7 +63,6 @@ input{
 #back-to-login{
      text-decoration: none;
      margin-top: 20px;
-    
 }
 
 /*Make the main content bigger on smaller screens*/
@@ -74,3 +71,4 @@ input{
         width:80%;
     }
 }
+
