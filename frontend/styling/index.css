@@ -20,7 +20,7 @@ a {
 
 /*Centers the image and sizes it*/
 #logo img{
-    margin-top: 60px;
+    transform: translateY(10px);
     margin-left: 25px;
     width:300px;
 }
@@ -89,7 +89,7 @@ a {
 }
 
 .bottom-links a{
-    margin: 8px;
+    padding: 5px;
 }
 
 .left-container{
