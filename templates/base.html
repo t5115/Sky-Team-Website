@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sky Team Website{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .sky-login-bg {
+            background: linear-gradient(135deg, #062b64 0%, #0a4ea3 55%, #39a0ff 100%);
+        }
+
+        .sky-login-card {
+            background-color: #ffffff;
+        }
+
+        .sky-btn {
+            background-color: #003087;
+            border: none;
+            color: white;
+            border-radius: 12px;
+        }
+
+        .sky-btn:hover {
+            background-color: #00246b;
+            color: white;
+        }
+
+        .sky-link {
+            color: #003087;
+        }
+
+        .sky-link:hover {
+            color: #001f5c;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
