@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Check your email{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center sky-login-bg">
+    <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5 sky-login-card text-center" style="width: 100%; max-width: 520px;">
+
+        <div class="mb-4">
+            <span class="badge rounded-pill text-bg-primary px-3 py-2 mb-3">SKY</span>
+            <h1 class="h3 fw-bold mb-3">Check your email</h1>
+            <p class="text-muted mb-0">
+                If this email address can be used, a registration link has been sent.
+            </p>
+        </div>
+
+        <div class="alert alert-info mb-4" role="alert">
+            Please check your inbox and spam folder.
+        </div>
+
+        <div>
+            <a href="{% url 'CustomLoginView' %}" class="btn sky-btn w-100 py-2 fw-semibold">
+                Back to login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

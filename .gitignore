@@ -1,0 +1,193 @@
+# =====================================
+
+# 🌍 Cross-Platform .gitignore
+
+# (Linux / macOS / Windows)
+
+# =====================================
+
+# ==============================
+
+# 🐍 Python
+
+# ==============================
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Compiled files
+
+*.so
+
+# ==============================
+
+# 🌱 Virtual Environments
+
+# ==============================
+
+venv/
+env/
+ENV/
+.venv/
+
+# ==============================
+
+# 🌐 Django
+
+# ==============================
+
+*.log
+*.pot
+*.pyc
+
+# SQLite database (local only)
+
+db.sqlite3
+db.sqlite3-journal
+
+# Static & media (generated files)
+
+staticfiles/
+media/
+
+# ==============================
+
+# 🔐 Environment Variables
+
+# ==============================
+
+.env
+.env.*
+*.env
+
+# ==============================
+
+# 🧠 IDE / Editors
+
+# ==============================
+
+# VSCode
+
+.vscode/
+
+# JetBrains (PyCharm, IntelliJ)
+
+.idea/
+
+# Sublime
+
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+
+*.swp
+*.swo
+
+# General temp
+
+*~
+*.tmp
+
+# ==============================
+
+# 💻 OS Files
+
+# ==============================
+
+# macOS
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+
+*~
+
+# ==============================
+
+# 📊 Logs
+
+# ==============================
+
+logs/
+*.log
+
+# ==============================
+
+# 🧪 Testing / Coverage
+
+# ==============================
+
+htmlcov/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+
+# ==============================
+
+# 📦 Build / Distribution
+
+# ==============================
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ==============================
+
+# 🌐 Node (future-proof)
+
+# ==============================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==============================
+
+# 🔑 Secrets / Certificates
+
+# ==============================
+
+*.pem
+*.key
+*.crt
+
+# ==============================
+
+# 🗃️ Database backups
+
+# ==============================
+
+*.sql
+*.sqlite3
+
+# ==============================
+
+# 🚫 Optional (Discuss with team)
+
+# ==============================
+
+# Uncomment ONLY if your team agrees
+
+# Django migrations (⚠️ usually KEEP in team projects)
+
+# */migrations/
+
+# !*/migrations/**init**.py
+
+# Static folder (⚠️ depends on deployment strategy)
+
+# static/
