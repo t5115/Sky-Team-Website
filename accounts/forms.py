@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm , PasswordResetForm , SetPasswordForm
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
@@ -46,7 +46,7 @@ class RegistrationEmailRequestForm(forms.Form):
         if allowed_domains:
             domain = email.split("@", 1)[1]
             if domain not in allowed_domains:
-                raise ValidationError("Please use an approved company email address.")
+                raise ValidationError("Invalid email address.")
 
         return email
 
@@ -81,3 +81,32 @@ class CompleteRegistrationForm(forms.Form):
             raise ValidationError("The two password fields must match.")
 
         return cleaned_data
+    
+class CustomPasswordResetForm(PasswordResetForm):
+    email = forms.EmailField(
+        max_length=320,
+        label="Email address",
+        widget=forms.EmailInput(attrs={
+            "class": "form-control form-control-lg",
+            "placeholder": "Enter your email address"
+        })
+    )
+
+class CustomSetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label="New password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control form-control-lg",
+            "placeholder": "Enter your new password"
+        }),
+        help_text=SetPasswordForm.base_fields["new_password1"].help_text,
+    )
+    new_password2 = forms.CharField(
+        label="Confirm new password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control form-control-lg",
+            "placeholder": "Confirm your new password"
+        }),
+    )
