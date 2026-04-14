@@ -15,32 +15,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path , include
-from django.shortcuts import render 
-
-def home_view(request):
-    return render(request, "index.html")  
-
-def create_view(request):
-    return render(request,"pages/signup.html")
-
-def forgot_password(request):
-    return render(request, "pages/reset_account.html")
+from django.urls import path , include 
+from django.http import HttpResponse 
 
 urlpatterns = [
-    path("admin/" , admin.site.urls),
+    path('admin/', admin.site.urls),
+]
 
-    # Authentication URLs
-    path("accounts/" , include("accounts.urls")),  
+def home_view( request ): 
+    return HttpResponse("Welcome to the Sky project home pqge.")
 
-    # home route
-    path("" , home_view , name="home"),
-    
-    #Create account
-    path("create_account/",create_view,name="create-account"),
+urlpatterns = [
+    path("admin/" , admin.site.urls ) , 
 
-    #Forgot Password
-    path("forgot_password",forgot_password,name="forgot-password"),
+    # Authentication URLs 
+    path("" , include("accounts.urls")) , 
+
+    # poeple module URLs 
+    path("people/" , include("people.urls") ) , 
 
     # home route 
     path("" , home_view , name="home" ) , 
