@@ -31,6 +31,9 @@ urlpatterns = [
     # Authentication URLs 
     path("" , include("accounts.urls")) , 
 
+    # poeple module URLs 
+    path("people/" , include("people.urls") ) , 
+
     # home route 
     path("" , home_view , name="home" ) , 
 ]

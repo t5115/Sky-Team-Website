@@ -3,6 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView
 from .views import request_registration_link_view, complete_registration_view
 from .forms import CustomPasswordResetForm , CustomSetPasswordForm
+
 urlpatterns = [
     path(
         "login/",
