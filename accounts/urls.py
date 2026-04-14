@@ -6,7 +6,6 @@ from .forms import CustomPasswordResetForm , CustomSetPasswordForm, CustomAuthen
 
 app_name = "accounts"
 from .forms import CustomPasswordResetForm , CustomSetPasswordForm
-
 urlpatterns = [
     path(
         "login/",
