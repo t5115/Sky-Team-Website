@@ -18,10 +18,6 @@ from django.contrib import admin
 from django.urls import path , include 
 from django.http import HttpResponse 
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
-
 def home_view( request ): 
     return HttpResponse("Welcome to the Sky project home pqge.")
 
