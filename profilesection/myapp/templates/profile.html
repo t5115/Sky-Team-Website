@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Profile
+{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="row align-items-center">
+        
+        <div class="col-md-8">
+          <h2 class="mb-3">{{ profile.name }}</h2>
+
+          <div class="mb-2">
+            <strong>Department:</strong> {{ profile.department }}
+          </div>
+
+          <div class="mb-2">
+            <strong>Role:</strong> {{ profile.role }}
+          </div>
+
+          <div class="mb-2">
+            <strong>Team:</strong> {{ profile.team }}
+          </div>
+
+          <div class="mb-2">
+            <strong>Email:</strong> {{ profile.email }}
+          </div>
+
+          <div class="mb-2">
+            <strong>Phone Number:</strong> {{ profile.phone_number }}
+          </div>
+
+          <a href="{% url 'profile_edit' profile.id %}" class="btn btn-primary mt-3">Edit Profile</a>
+        </div>
+
+        <div class="col-md-4 text-md-right text-center mt-4 mt-md-0">
+          <div
+            style="
+              width: 140px;
+              height: 140px;
+              border-radius: 50%;
+              background-color: #dee2e6;
+              display: inline-block;
+            "
+          ></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
