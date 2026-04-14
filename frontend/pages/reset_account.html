@@ -1,18 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Account</title>
-    <link rel="stylesheet" href="../main.css">
-    <link rel="stylesheet" href="../styling/reset_account.css">
+    
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'styling/reset_account.css' %}">
 </head>
 <body>
 
     <!--Holds main page content-->
     <div class="main-container">
         
-        <img id="sky-logo" src="../assets/public/sky_logo.svg">
+        <img id="sky-logo" src="{% static 'assets/public/sky_logo.svg' %}">
 
         <h3 id="reset-password-text">Reset Password</h3>
         <a id="reset-info-text">Please enter the email address that you'd like your password reset instructions sent to.</a>
@@ -24,7 +26,7 @@
             <button type="submit">Request Reset Link</button>
         </div>
 
-        <a href="../index.html" id="back-to-login">Back to login page</a>
+        <a href="{% url 'home' %}" id="back-to-login">Back to login page</a>
     </div>
 </body>
 </html>
