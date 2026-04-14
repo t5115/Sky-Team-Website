@@ -39,7 +39,7 @@
                         <input type="checkbox">
                         Remember me
                     </label>
-                    <a href="pages/reset_account.html">Forgot password</a>
+                    <a href="{%url 'forgot-password'%}">Forgot password</a>
                 </div>
 
             </div>
@@ -50,7 +50,7 @@
 
             <div class="bottom-links">
                 <a href="#">Admin Login</a>
-                <a href="pages/signup.html">Create Account</a>
+                <a href="{% url 'create-account' %}">Create Account</a>
             </div>
 
         </div>

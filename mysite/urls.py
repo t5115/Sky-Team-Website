@@ -18,12 +18,14 @@ from django.contrib import admin
 from django.urls import path , include
 from django.shortcuts import render 
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
-
 def home_view(request):
     return render(request, "index.html")  
+
+def create_view(request):
+    return render(request,"pages/signup.html")
+
+def forgot_password(request):
+    return render(request, "pages/reset_account.html")
 
 urlpatterns = [
     path("admin/" , admin.site.urls),
@@ -33,4 +35,10 @@ urlpatterns = [
 
     # home route
     path("" , home_view , name="home"),
+    
+    #Create account
+    path("create_account/",create_view,name="create-account"),
+
+    #Forgot Password
+    path("forgot_password",forgot_password,name="forgot-password")
 ]
