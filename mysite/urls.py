@@ -15,22 +15,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path , include 
-from django.http import HttpResponse 
+from django.urls import path , include
+from django.shortcuts import render 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-def home_view( request ): 
-    return HttpResponse("Welcome to the Sky project home pqge.")
+def home_view(request):
+    return render(request, "index.html")  
 
 urlpatterns = [
-    path("admin/" , admin.site.urls ) , 
+    path("admin/" , admin.site.urls),
 
-    # Authentication URLs 
-    path("" , include("accounts.urls")) , 
+    # Authentication URLs
+    path("accounts/" , include("accounts.urls")),  
 
-    # home route 
-    path("" , home_view , name="home" ) , 
+    # home route
+    path("" , home_view , name="home"),
 ]

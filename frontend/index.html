@@ -1,14 +1,15 @@
 <!-- Login Page -->
 
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sky - Login Page</title>
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="styling/index.css">
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'styling/index.css' %}">
 </head>
 <body>
     
@@ -18,14 +19,14 @@
 
         <!--Container for other half containing image-->
         <div class="left-container">
-            <img src="assets/login_page/login-man.png">
+            <img src="{% static 'assets/login_page/login-man.png' %}" alt="Login Man">
         </div>
 
         <!--Container for Login-->
         <div class="login-container">
 
             <div id="logo">
-                <img src="assets//public/sky_logo.svg" alt="Sky Logo">
+                <img src="{% static 'assets/public/sky_logo.svg' %}" alt="Sky Logo">
             </div>
 
             <div class="info-forms">
