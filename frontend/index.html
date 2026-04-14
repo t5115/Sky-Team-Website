@@ -28,25 +28,30 @@
             <div id="logo">
                 <img src="{% static 'assets/public/sky_logo.svg' %}" alt="Sky Logo">
             </div>
+            
+            <form method="POST" action="{% url 'accounts:CustomLoginView' %}">
+                {% csrf_token %}
 
-            <div class="info-forms">
-                <h3 id="login-text">Login</h3>
-                <input type="email" placeholder="Email">
-                <input type="password" placeholder="Password">
+                <div class="info-forms">
+                    <h3 id="login-text">Login</h3>
+                    <input type="text" name="username" placeholder="Email">
+                    <input type="password" name="password" placeholder="Password">
 
-                <div class="helpers">
-                    <label class="remember">
-                        <input type="checkbox">
-                        Remember me
-                    </label>
-                    <a href="{%url 'forgot-password'%}">Forgot password</a>
+                    <div class="helpers">
+                        <label class="remember">
+                            <input type="checkbox" name="remember">
+                            Remember me
+                        </label>
+                        <a href="{%url 'forgot-password'%}">Forgot password</a>
+                    </div>
+
                 </div>
 
-            </div>
-
-            <div class="login-button">
-                <button type="submit" onclick="location.href='pages/transition.html'">Login</button>
-            </div>
+                <div class="login-button">
+                    <button type="submit">Login</button>
+                </div>
+            
+            </form>
 
             <div class="bottom-links">
                 <a href="#">Admin Login</a>

@@ -40,5 +40,8 @@ urlpatterns = [
     path("create_account/",create_view,name="create-account"),
 
     #Forgot Password
-    path("forgot_password",forgot_password,name="forgot-password")
+    path("forgot_password",forgot_password,name="forgot-password"),
+
+
+
 ]

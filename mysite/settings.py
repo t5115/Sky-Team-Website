@@ -104,8 +104,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "frontend" / "static"]
 
 # Auth redirects
-LOGIN_REDIRECT_URL = "/"
-LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/pages/main/dashboard.html"
+LOGIN_URL = "/"
 
 
 # Email config (safe fallback for dev)

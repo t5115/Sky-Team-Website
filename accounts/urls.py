@@ -2,11 +2,17 @@ from django.urls import path , reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView
 from .views import request_registration_link_view, complete_registration_view
-from .forms import CustomPasswordResetForm , CustomSetPasswordForm
+from .forms import CustomPasswordResetForm , CustomSetPasswordForm, CustomAuthenticationForm
+
+app_name = "accounts"
+
 urlpatterns = [
     path(
         "login/",
-        LoginView.as_view(template_name="accounts/login.html"),
+        LoginView.as_view(
+            template_name="index.html",
+            authentication_form=CustomAuthenticationForm
+                          ),
         name="CustomLoginView",
     ),
     path(
