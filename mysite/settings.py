@@ -44,6 +44,9 @@ INSTALLED_APPS = [
 
     # the app for authentication  
     'accounts',
+
+    # the app for people modue
+    'people' , 
 ]
 
 MIDDLEWARE = [
