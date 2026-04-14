@@ -5,6 +5,7 @@ from .views import request_registration_link_view, complete_registration_view
 from .forms import CustomPasswordResetForm , CustomSetPasswordForm, CustomAuthenticationForm
 
 app_name = "accounts"
+from .forms import CustomPasswordResetForm , CustomSetPasswordForm
 
 urlpatterns = [
     path(

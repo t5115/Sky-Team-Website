@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Allows correct display of text characters -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes page responsive -->
+    <title>People</title> <!-- Browser tab title -->
+</head>
+<body>
+    <h1>People Directory</h1> <!-- Main page title -->
+
+    {% if people %}
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>First Name</th>   <!-- Person's first name -->
+                    <th>Last Name</th>    <!-- Person's last name -->
+                    <th>Email</th>        <!-- Person's email -->
+                    <th>Job Title</th>    <!-- Person's job title -->
+                    <th>Team</th>         <!-- Person's team -->
+                    <th>Department</th>   <!-- Person's department -->
+                    <th>Status</th>       <!-- Person active/inactive status -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in people %}
+                    <tr>
+                        <td>{{ person.first_name }}</td>
+                        <td>{{ person.last_name }}</td>
+                        <td>{{ person.email }}</td>
+                        <td>{{ person.job_title }}</td>
+                        <td>{{ person.team_name }}</td>
+                        <td>{{ person.department_name }}</td>
+                        <td>
+                            {% if person.is_active %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No people have been added yet.</p> <!-- Message shown if there are no Person records -->
+    {% endif %}
+</body>
+</html>

@@ -42,6 +42,9 @@ urlpatterns = [
     #Forgot Password
     path("forgot_password",forgot_password,name="forgot-password"),
 
+    # poeple module URLs 
+    path("people/" , include("people.urls") ) , 
 
-
+    # home route 
+    path("" , home_view , name="home" ) , 
 ]
