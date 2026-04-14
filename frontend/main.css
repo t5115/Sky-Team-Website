@@ -1,6 +1,13 @@
+@font-face {
+    font-family: 'Custom Inter'; 
+    src: url('./assets/fonts/Inter.ttf') format('truetype');
+    font-weight: 100 900; 
+    font-style: normal;
+}
+
 /* Global styles for every page */
 
 body{
     margin:0;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-family:"Custom Inter", sans-serif;
 }
