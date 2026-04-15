@@ -62,6 +62,12 @@
                         Edit Profile
                     </a>
 
+                    {% if is_superuser_viewer and not person.user %}
+                     <a href="{% url 'people:person_link_user' person.pk %}" class="btn btn-outline-primary">
+                        Link User Account
+                     </a>
+                    {% endif %}
+
                     {% if person.is_active %}
                         <form method="post" action="{% url 'people:person_deactivate' person.pk %}">
                             {% csrf_token %}
@@ -94,3 +100,5 @@
 </div>
 
 {% endblock %}
+
+
