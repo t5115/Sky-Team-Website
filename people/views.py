@@ -16,6 +16,13 @@ from .models import Person
 # Import the form used for editing Person profiles 
 from .forms import PersonForm
 
+# Import helper to fetch an object or raise 404 if it does not exist
+from django.shortcuts import get_object_or_404, redirect
+
+# Import decorators for authentication and POST-only access
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+
 class PersonListView(LoginRequiredMixin, ListView):
     """
     Display a list of Person records.
@@ -198,3 +205,73 @@ class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         Redirect back to the person's detail page after a successful update.
         """
         return reverse_lazy("people:person_detail", kwargs={"pk": self.object.pk})
+
+@login_required
+@require_POST
+def deactivate_person_view(request, pk):
+    """
+    Deactivate a Person profile by setting is_active to False.
+
+    Permission rules:
+    - superusers can deactivate any profile
+    - regular users can deactivate only their own linked profile
+    """
+
+    # Find the Person record or return 404 if it does not exist
+    person = get_object_or_404(Person, pk=pk)
+
+    # The currently logged-in user
+    current_user = request.user
+
+    # Check whether this user is allowed to deactivate this profile
+    can_deactivate = current_user.is_superuser or person.user == current_user
+
+    # If the user is not allowed, redirect them back to the profile page
+    if not can_deactivate:
+        return redirect("people:person_detail", pk=person.pk)
+
+    # Perform a soft delete by marking the profile as inactive
+    person.is_active = False
+
+    # Save only the changed field for efficiency and clarity
+    person.save(update_fields=["is_active"])
+
+    # Redirect after success
+    # If a regular user deactivates their own profile, sending them to the list page is reasonable.
+    # If a superuser deactivates someone else's profile, the detail page is also acceptable.
+    return redirect("people:person_detail", pk=person.pk)
+
+
+
+@login_required
+@require_POST
+def reactivate_person_view(request, pk):
+    """
+    Reactivate a Person profile by setting is_active to True.
+
+    Permission rules:
+    - superusers can reactivate any profile
+    - regular users can reactivate only their own linked profile
+    """
+
+    # Find the Person record or return 404 if it does not exist
+    person = get_object_or_404(Person, pk=pk)
+
+    # The currently logged-in user
+    current_user = request.user
+
+    # Check whether this user is allowed to reactivate this profile
+    can_reactivate = current_user.is_superuser or person.user == current_user
+
+    # If the user is not allowed, redirect them back to the profile page
+    if not can_reactivate:
+        return redirect("people:person_detail", pk=person.pk)
+
+    # Reactivate the profile
+    person.is_active = True
+
+    # Save only the changed field
+    person.save(update_fields=["is_active"])
+
+    # Redirect back to the profile page
+    return redirect("people:person_detail", pk=person.pk)

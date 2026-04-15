@@ -56,17 +56,35 @@
             </div>
 
             <!-- Action buttons -->
-            {% if can_manage_profile %}
+             {% if can_manage_profile %}
                 <div class="d-flex gap-2">
-                    <!-- Placeholder edit button -->
                     <a href="{% url 'people:person_edit' person.pk %}" class="btn btn-primary">
-                       Edit Profile
+                        Edit Profile
                     </a>
 
-                    <!-- Placeholder deactivate button -->
-                    <a href="#" class="btn btn-outline-danger">
-                        Deactivate Profile
-                    </a>
+                    {% if person.is_active %}
+                        <form method="post" action="{% url 'people:person_deactivate' person.pk %}">
+                            {% csrf_token %}
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger"
+                                onclick="return confirm('Are you sure you want to deactivate this profile?');"
+                            >
+                                Deactivate Profile
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'people:person_reactivate' person.pk %}">
+                            {% csrf_token %}
+                            <button
+                                type="submit"
+                                class="btn btn-outline-success"
+                                onclick="return confirm('Are you sure you want to reactivate this profile?');"
+                            >
+                                Reactivate Profile
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             {% endif %}
 
