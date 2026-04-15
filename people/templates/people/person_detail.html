@@ -59,8 +59,8 @@
             {% if can_manage_profile %}
                 <div class="d-flex gap-2">
                     <!-- Placeholder edit button -->
-                    <a href="#" class="btn btn-primary">
-                        Edit Profile
+                    <a href="{% url 'people:person_edit' person.pk %}" class="btn btn-primary">
+                       Edit Profile
                     </a>
 
                     <!-- Placeholder deactivate button -->

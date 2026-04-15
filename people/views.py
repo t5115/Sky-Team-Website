@@ -1,15 +1,20 @@
-# Import Django's generic ListView for pages that display multiple objects
+# Import Django's generic views for displaying and editing objects
 from django.views.generic import ListView, DetailView
+from django.views.generic.edit import UpdateView
 
-# Import a mixin that forces the user to be logged in before accessing the page
-from django.contrib.auth.mixins import LoginRequiredMixin
+# Import authentication mixins
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Import Q so we can build OR-based search conditions across multiple fields
 from django.db.models import Q
 
-# Import the Person model so the view can read Person records from the database
-from .models import Person
+# Import reverse_lazy to build success URLs cleanly
+from django.urls import reverse_lazy
 
+# Import the Person model so the views can read Person records from the database
+from .models import Person
+# Import the form used for editing Person profiles 
+from .forms import PersonForm
 
 class PersonListView(LoginRequiredMixin, ListView):
     """
@@ -138,3 +143,58 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context["is_superuser_viewer"] = is_superuser
 
         return context
+    
+class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Update an existing Person profile.
+
+    Permission rules:
+    - superusers can edit any profile
+    - regular users can edit only their own linked Person profile
+    """
+
+    # The model this update view edits
+    model = Person
+
+    # The form used to update the person
+    from_class = PersonForm
+    
+    
+
+    # Fields that are allowed to be edited through this form
+    fields = [
+        "first_name",
+        "last_name",
+        "role",
+        "job_title",
+        "email",
+        "phone_number",
+        "team_name",
+        "department_name",
+    ]
+
+    # The HTML template used to render the edit form
+    template_name = "people/person_form.html"
+
+    def test_func(self):
+        """
+        Return True only if the current user is allowed to edit this profile.
+        """
+        # The person record being edited
+        person = self.get_object()
+
+        # The currently logged-in user
+        current_user = self.request.user
+
+        # Superusers can edit any profile
+        if current_user.is_superuser:
+            return True
+
+        # Regular users can edit only their own linked profile
+        return person.user == current_user
+
+    def get_success_url(self):
+        """
+        Redirect back to the person's detail page after a successful update.
+        """
+        return reverse_lazy("people:person_detail", kwargs={"pk": self.object.pk})
