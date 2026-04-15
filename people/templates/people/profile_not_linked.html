@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ page_title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <h2 class="fw-bold text-primary mb-3">{{ page_title }}</h2>
+            <p class="text-muted mb-4">
+                {{ message }}
+            </p>
+
+            <a href="{% url 'people:person_list' %}" class="btn btn-outline-primary">
+                Back to People Directory
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -142,3 +142,88 @@ class PersonCreateForm(forms.ModelForm):
             self.add_error("email", "The person's email must match the selected user's email.")
 
         return cleaned_data
+
+
+class PersonLinkUserForm(forms.ModelForm):
+    """
+    Form used only for linking an existing Person profile
+    to an existing User account.
+
+    This form is intended for superusers only.
+
+    Business rules:
+    - the Person profile must currently be unlinked
+    - the selected User must not already be linked to another Person
+    - the selected User email must match the Person email
+    """
+
+    # Dropdown field that lets the superuser choose one available user account
+    user = forms.ModelChoiceField(
+        queryset=User.objects.none(),
+        required=True,
+        empty_label="Select a user account",
+        widget=forms.Select(attrs={"class": "form-select"}),
+        help_text="Only unlinked user accounts are shown.",
+    )
+
+    class Meta:
+        model = Person
+
+        # We only edit the user link in this form
+        fields = ["user"]
+
+    def __init__(self, *args, **kwargs):
+        """
+        Limit the dropdown to users that are not already linked
+        to another Person profile.
+
+        Because Person.user is a OneToOneField, a user account
+        can only belong to one Person profile.
+        """
+        super().__init__(*args, **kwargs)
+
+        # Show only users that do not already have a linked person profile
+        self.fields["user"].queryset = User.objects.filter(
+            person_profile__isnull=True
+        ).order_by("email")
+
+    def clean(self):
+        """
+        Validate the selected user against the current Person profile.
+
+        We use form-level validation so the superuser gets a clear,
+        friendly error message before the model save happens.
+        """
+        cleaned_data = super().clean()
+
+        selected_user = cleaned_data.get("user")
+        person = self.instance
+
+        # Safety check: this linking form should only be used for existing profiles
+        if not person or not person.pk:
+            raise forms.ValidationError("This form can only be used for an existing profile.")
+
+        # Prevent linking if the profile is already linked
+        if person.user:
+            raise forms.ValidationError("This profile is already linked to a user account.")
+
+        # Stop here if no user was selected
+        if not selected_user:
+            return cleaned_data
+
+        # Normalize emails before comparison
+        person_email = (person.email or "").strip().lower()
+        user_email = (selected_user.email or "").strip().lower()
+
+        # The selected user must have an email address
+        if not user_email:
+            self.add_error("user", "The selected user account does not have an email address.")
+
+        # The emails must match because your model enforces that rule
+        if person_email and user_email and person_email != user_email:
+            self.add_error(
+                "user",
+                "This user cannot be linked because the user email does not match the profile email."
+            )
+
+        return cleaned_data

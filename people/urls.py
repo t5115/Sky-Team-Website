@@ -16,6 +16,9 @@ urlpatterns = [
     # Route for viewing one person's profile 
     path("<int:pk>/" , views.PersonDetailView.as_view() , name = "person_detail" ) , 
 
+    # Route for accounts profiles 
+    path("my-profile/", views.MyProfileRedirectView.as_view(), name="my_profile"),
+
    # Route for adding a new profile
     path("add/", views.PersonCreateView.as_view(), name="person_create") , 
     
@@ -27,5 +30,8 @@ urlpatterns = [
 
     # Route for reactivating one person's profile
     path("<int:pk>/reactivate/", views.reactivate_person_view, name="person_reactivate"),
+
+    # Route for linking a person profile to an existing user account
+    path("<int:pk>/link-user/", views.PersonLinkUserView.as_view(), name="person_link_user"),
 
 ]

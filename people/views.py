@@ -13,8 +13,8 @@ from django.urls import reverse_lazy
 
 # Import the Person model so the views can read Person records from the database
 from .models import Person
-# Import the form used for editing Person profiles 
-from .forms import PersonForm , PersonCreateForm
+# Import the form used for editing , creating and linking Person profiles 
+from .forms import PersonForm, PersonCreateForm, PersonLinkUserForm
 
 # Import helper to fetch an object or raise 404 if it does not exist
 from django.shortcuts import get_object_or_404, redirect
@@ -22,6 +22,10 @@ from django.shortcuts import get_object_or_404, redirect
 # Import decorators for authentication and POST-only access
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+
+from django.views import View
+
+from django.shortcuts import render
 
 class PersonListView(LoginRequiredMixin, ListView):
     """
@@ -150,6 +154,41 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context["is_superuser_viewer"] = is_superuser
 
         return context
+class MyProfileRedirectView(LoginRequiredMixin, View):
+    """
+    Handle the 'My Profile' action for the currently logged-in user.
+
+    Behavior:
+    - If the logged-in user has a linked Person profile, redirect to it.
+    - If the user does not have a linked Person profile yet, show
+      a friendly message page explaining that the account is not linked.
+    """
+
+    def get(self, request, *args, **kwargs):
+        """
+        Process the request when the user clicks 'My Profile'.
+        """
+        try:
+            # Try to access the Person linked to the current user.
+            # This works because Person.user uses related_name="person_profile".
+            person = request.user.person_profile
+
+            # If the linked profile exists, redirect the user to their profile page.
+            return redirect("people:person_detail", pk=person.pk)
+
+        except Person.DoesNotExist:
+            # If no linked profile exists yet, render a helpful message page.
+            return render(
+                request,
+                "people/profile_not_linked.html",
+                {
+                    "page_title": "Profile Not Linked",
+                    "message": (
+                        "Your user account is not linked to a profile yet. "
+                        "Please contact the site administrator."
+                    ),
+                },
+            )
 class PersonCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
     Create a new Person profile.
@@ -325,3 +364,61 @@ def reactivate_person_view(request, pk):
 
     # Redirect back to the profile page
     return redirect("people:person_detail", pk=person.pk)
+
+class PersonLinkUserView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Link an existing Person profile to an existing User account.
+
+    Only superusers can access this page.
+
+    This action is intended only for profiles that are currently unlinked.
+    If the profile is already linked, access is denied.
+    """
+
+    # The model we are updating
+    model = Person
+
+    # The dedicated form used only for the linking action
+    form_class = PersonLinkUserForm
+
+    # We will use a dedicated template for this linking page
+    template_name = "people/person_link_user.html"
+
+    # Return HTTP 403 instead of redirecting silently when access is denied
+    raise_exception = True
+
+    def test_func(self):
+        """
+        Allow access only to superusers, and only if the profile
+        is not already linked to a user account.
+        """
+        # First, only superusers are allowed
+        if not self.request.user.is_superuser:
+            return False
+
+        # Get the current Person object
+        person = self.get_object()
+
+        # Only allow this action for profiles that are not linked yet
+        return person.user is None
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra context used by the template.
+        """
+        context = super().get_context_data(**kwargs)
+
+        context["page_title"] = "Link User Account"
+        context["page_subtitle"] = (
+            f"Link the profile of {self.object.first_name} {self.object.last_name} "
+            f"to an existing user account."
+        )
+        context["person"] = self.object
+
+        return context
+
+    def get_success_url(self):
+        """
+        After successful linking, go back to the profile detail page.
+        """
+        return reverse_lazy("people:person_detail", kwargs={"pk": self.object.pk})
