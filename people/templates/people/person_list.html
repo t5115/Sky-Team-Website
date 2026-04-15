@@ -12,10 +12,15 @@ People Directory
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary">People Directory</h2>
 
-        <!-- This button will later point to the real Create Person page -->
-        <a href="#" class="btn btn-primary">
-            + Add Person
-        </a>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary">People Directory</h2>
+
+            {% if request.user.is_superuser %}
+                <a href="{% url 'people:person_create' %}" class="btn btn-primary">
+                    + Add Person
+                </a>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Search and Filter Section -->

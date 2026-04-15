@@ -15,6 +15,9 @@ urlpatterns = [
 
     # Route for viewing one person's profile 
     path("<int:pk>/" , views.PersonDetailView.as_view() , name = "person_detail" ) , 
+
+   # Route for adding a new profile
+    path("add/", views.PersonCreateView.as_view(), name="person_create") , 
     
     # Route for editing one person's profile 
     path("<int:pk>/edit/" , views.PersonUpdateView.as_view() , name= "person_edit") , 
