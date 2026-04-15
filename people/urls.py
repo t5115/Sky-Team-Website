@@ -9,6 +9,10 @@ app_name = "people"
 
 # List of URL patterns for the People app
 urlpatterns = [
+
     # Route for the People list page
     path("", views.PersonListView.as_view(), name="person_list"),
+
+    # Route for viewing one person's profile 
+    path("<int:pk>/" , views.PersonDetailView.as_view() , name = "person_detail" )
 ]

@@ -1,5 +1,5 @@
 # Import Django's generic ListView for pages that display multiple objects
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 # Import a mixin that forces the user to be logged in before accessing the page
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -85,5 +85,56 @@ class PersonListView(LoginRequiredMixin, ListView):
 
         # Add the departments list to the template context
         context["departments"] = departments
+
+        return context
+    
+
+class PersonDetailView(LoginRequiredMixin, DetailView):
+    """
+    Display one person's profile page.
+
+    Any logged-in user can view a person's profile.
+    The template will decide whether Edit and Deactivate buttons
+    should be shown based on the current user's permissions.
+    """
+
+    # The model this detail view works with
+    model = Person
+
+    # The HTML template used to render the person profile page
+    template_name = "people/person_detail.html"
+
+    # The name used in the template for the Person object
+    context_object_name = "person"
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra context flags used by the template
+        to decide whether Edit/Deactivate buttons should appear.
+        """
+        # Get the default context from DetailView
+        context = super().get_context_data(**kwargs)
+
+        # The profile currently being viewed
+        person = self.get_object()
+
+        # The currently logged-in user
+        current_user = self.request.user
+
+        # Superusers can manage every profile
+        is_superuser = current_user.is_superuser
+
+        # A regular user can manage only their own linked Person profile
+        is_own_profile = person.user == current_user
+
+        # A profile is manageable if:
+        # - the current user is a superuser
+        # OR
+        # - the current user is viewing their own profile
+        context["can_manage_profile"] = is_superuser or is_own_profile
+
+        # Add smaller flags too because they make the template easier to read
+        context["is_own_profile"] = is_own_profile
+        context["is_superuser_viewer"] = is_superuser
 
         return context
