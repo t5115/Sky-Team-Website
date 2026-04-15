@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ person.first_name }} {{ person.last_name }} - Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-1">
+                {{ person.first_name }} {{ person.last_name }}
+            </h2>
+            <p class="text-muted mb-0">
+                Person Profile
+            </p>
+        </div>
+
+        <!-- Back to list -->
+        <a href="{% url 'people:person_list' %}" class="btn btn-outline-secondary">
+            Back to People
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <!-- Basic profile information -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>First Name:</strong> {{ person.first_name }}</p>
+                    <p><strong>Last Name:</strong> {{ person.last_name }}</p>
+                    <p><strong>Email:</strong> {{ person.email }}</p>
+                    <p><strong>Phone Number:</strong> {{ person.phone_number|default:"Not provided" }}</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Role:</strong> {{ person.role|default:"Not provided" }}</p>
+                    <p><strong>Job Title:</strong> {{ person.job_title|default:"Not provided" }}</p>
+                    <p><strong>Team:</strong> {{ person.team_name|default:"Not assigned" }}</p>
+                    <p><strong>Department:</strong> {{ person.department_name|default:"Not assigned" }}</p>
+                </div>
+            </div>
+
+            <!-- Active status -->
+            <div class="mb-4">
+                <strong>Status:</strong>
+                {% if person.is_active %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                {% endif %}
+            </div>
+
+            <!-- Action buttons -->
+            {% if can_manage_profile %}
+                <div class="d-flex gap-2">
+                    <!-- Placeholder edit button -->
+                    <a href="#" class="btn btn-primary">
+                        Edit Profile
+                    </a>
+
+                    <!-- Placeholder deactivate button -->
+                    <a href="#" class="btn btn-outline-danger">
+                        Deactivate Profile
+                    </a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

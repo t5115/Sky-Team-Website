@@ -125,9 +125,7 @@ People Directory
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-outline-primary">
-                                        View Profile
-                                    </a>
+                                    <a href="{% url 'people:person_detail' person.pk %}" class="btn btn-sm btn-outline-primary"> View Profile </a>
                                 </td>
                             </tr>
                         {% endfor %}
