@@ -1,48 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"> <!-- Allows correct display of text characters -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes page responsive -->
-    <title>People</title> <!-- Browser tab title -->
-</head>
-<body>
-    <h1>People Directory</h1> <!-- Main page title -->
+{% extends "base.html" %}
+
+{% block title %}
+People Directory
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">People Directory</h2>
+
+        <!-- This button will later point to the real Create Person page -->
+        <a href="#" class="btn btn-primary">
+            + Add Person
+        </a>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            {# 
+                We use GET because search and filtering only read data.
+                This lets the values appear in the URL as query parameters.
+            #}
+            <form method="get" action="">
+                <div class="row g-3 align-items-end">
+
+                    <!-- Search input -->
+                    <div class="col-md-6">
+                        <label for="search-input" class="form-label fw-semibold">
+                            Search
+                        </label>
+                        <input
+                            id="search-input"
+                            type="text"
+                            name="q"
+                            class="form-control"
+                            placeholder="Search by first name, last name, email,job title or team name"
+                            value="{{ request.GET.q }}"
+                        >
+                    </div>
+
+                    <!-- Department dropdown -->
+                    <div class="col-md-4">
+                        <label for="department-select" class="form-label fw-semibold">
+                            Department
+                        </label>
+                        <select
+                            id="department-select"
+                            name="department"
+                            class="form-select"
+                        >
+                            <option value="">All Departments</option>
+
+                            {# 
+                                Later, the view will send a departments list.
+                                For now, this loop is ready for that best-practice structure.
+                            #}
+                            {% for department in departments %}
+                                <option
+                                    value="{{ department }}"
+                                    {% if request.GET.department == department %}selected{% endif %}
+                                >
+                                    {{ department }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filter button -->
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-outline-primary">
+                            Apply
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Clear filters button -->
+                <div class="mt-3">
+                    <a href="{% url 'people:person_list' %}" class="btn btn-link p-0">
+                        Clear filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {% if people %}
-        <table border="1" cellpadding="8" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>First Name</th>   <!-- Person's first name -->
-                    <th>Last Name</th>    <!-- Person's last name -->
-                    <th>Email</th>        <!-- Person's email -->
-                    <th>Job Title</th>    <!-- Person's job title -->
-                    <th>Team</th>         <!-- Person's team -->
-                    <th>Department</th>   <!-- Person's department -->
-                    <th>Status</th>       <!-- Person active/inactive status -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for person in people %}
-                    <tr>
-                        <td>{{ person.first_name }}</td>
-                        <td>{{ person.last_name }}</td>
-                        <td>{{ person.email }}</td>
-                        <td>{{ person.job_title }}</td>
-                        <td>{{ person.team_name }}</td>
-                        <td>{{ person.department_name }}</td>
-                        <td>
-                            {% if person.is_active %}
-                                Active
-                            {% else %}
-                                Inactive
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Job Title</th>
+                            <th>Team</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for person in people %}
+                            <tr>
+                                <td>{{ person.first_name }}</td>
+                                <td>{{ person.last_name }}</td>
+                                <td>{{ person.email }}</td>
+                                <td>{{ person.job_title }}</td>
+                                <td>{{ person.team_name }}</td>
+                                <td>{{ person.department_name }}</td>
+                                <td>
+                                    {% if person.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        View Profile
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
     {% else %}
-        <p>No people have been added yet.</p> <!-- Message shown if there are no Person records -->
+
+        <div class="alert alert-info text-center">
+            No people have been added yet.
+        </div>
+
     {% endif %}
-</body>
-</html>
+
+</div>
+
+{% endblock %}

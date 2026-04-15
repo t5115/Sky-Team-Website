@@ -137,13 +137,11 @@ class Person(models.Model):
             # If the setting is missing, default to an empty list.
             allowed_domains = getattr(settings, "ALLOWED_EMAIL_DOMAINS", [])
 
-            # Normalize the configured domains as well.
-            allowed_domains = [domain.strip().lower() for domain in allowed_domains if domain.strip()]
 
             if allowed_domains and email_domain not in allowed_domains:
                 errors["email"] = (
                     f"Email domain '{email_domain}' is not allowed. "
-                    f"Allowed domains: {', '.join(allowed_domains)}."
+                    f"Allowed domains: {allowed_domains}."
                 )
 
       
@@ -161,7 +159,7 @@ class Person(models.Model):
                 errors["email"] = "The person's email must match the linked user's email."
 
         
-        # Light validation for optional phone no
+        
        
 
       
