@@ -17,6 +17,12 @@ urlpatterns = [
     path("<int:pk>/" , views.PersonDetailView.as_view() , name = "person_detail" ) , 
     
     # Route for editing one person's profile 
-    path("<int:pk>/edit/" , views.PersonUpdateView.as_view() , name= "person_edit")
+    path("<int:pk>/edit/" , views.PersonUpdateView.as_view() , name= "person_edit") , 
+
+    # Route for deactivating one person's profile
+    path("<int:pk>/deactivate/", views.deactivate_person_view, name="person_deactivate"),
+
+    # Route for reactivating one person's profile
+    path("<int:pk>/reactivate/", views.reactivate_person_view, name="person_reactivate"),
 
 ]
