@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Edit Profile
+{{ page_title }}
 {% endblock %}
 
 {% block content %}
@@ -11,15 +11,21 @@ Edit Profile
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-primary mb-1">Edit Profile</h2>
+            <h2 class="fw-bold text-primary mb-1">{{ page_title }}</h2>
             <p class="text-muted mb-0">
-                Update profile information for {{ person.first_name }} {{ person.last_name }}
+                {{ page_subtitle }}
             </p>
         </div>
 
-        <a href="{% url 'people:person_detail' person.pk %}" class="btn btn-outline-secondary">
-            Cancel
-        </a>
+        {% if form_mode == "edit" %}
+            <a href="{% url 'people:person_detail' object.pk %}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        {% else %}
+            <a href="{% url 'people:person_list' %}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        {% endif %}
     </div>
 
     <div class="card shadow-sm">
@@ -29,6 +35,19 @@ Edit Profile
                 {% csrf_token %}
 
                 <div class="row g-3">
+
+                    {% if form.user %}
+                        <div class="col-md-12">
+                            <label for="{{ form.user.id_for_label }}" class="form-label">Linked User Account</label>
+                            {{ form.user }}
+                            {% if form.user.help_text %}
+                                <div class="form-text">{{ form.user.help_text }}</div>
+                            {% endif %}
+                            {% if form.user.errors %}
+                                <div class="text-danger small mt-1">{{ form.user.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
 
                     <div class="col-md-6">
                         <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
@@ -104,12 +123,22 @@ Edit Profile
 
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-primary">
-                        Save Changes
+                        {% if form_mode == "edit" %}
+                            Save Changes
+                        {% else %}
+                            Create Profile
+                        {% endif %}
                     </button>
 
-                    <a href="{% url 'people:person_detail' person.pk %}" class="btn btn-outline-secondary">
-                        Cancel
-                    </a>
+                    {% if form_mode == "edit" %}
+                        <a href="{% url 'people:person_detail' object.pk %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    {% else %}
+                        <a href="{% url 'people:person_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    {% endif %}
                 </div>
             </form>
 

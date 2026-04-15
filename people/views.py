@@ -1,6 +1,6 @@
 # Import Django's generic views for displaying and editing objects
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import CreateView, UpdateView
 
 # Import authentication mixins
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -14,7 +14,7 @@ from django.urls import reverse_lazy
 # Import the Person model so the views can read Person records from the database
 from .models import Person
 # Import the form used for editing Person profiles 
-from .forms import PersonForm
+from .forms import PersonForm , PersonCreateForm
 
 # Import helper to fetch an object or raise 404 if it does not exist
 from django.shortcuts import get_object_or_404, redirect
@@ -150,7 +150,55 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context["is_superuser_viewer"] = is_superuser
 
         return context
-    
+class PersonCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """
+    Create a new Person profile.
+
+    Only superusers are allowed to access this page.
+
+    This view uses a dedicated create form because the create workflow
+    supports optional linking to an existing User account, while the
+    normal edit form does not expose that field.
+    """
+
+    # The model this create view works with
+    model = Person
+
+    # Use the dedicated create form
+    form_class = PersonCreateForm
+
+    # Reuse the same Bootstrap form template used by the edit page
+    template_name = "people/person_form.html"
+
+    # Return HTTP 403 for logged-in users who are not allowed
+    raise_exception = True
+
+    def test_func(self):
+        """
+        Allow access only to superusers.
+        """
+        return self.request.user.is_superuser
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra template context so the shared form template
+        can display the correct title, subtitle, and cancel link.
+        """
+        context = super().get_context_data(**kwargs)
+
+        context["form_mode"] = "create"
+        context["page_title"] = "Add New Profile"
+        context["page_subtitle"] = "Create a new person profile and optionally link it to an existing user account."
+
+        return context
+
+    def get_success_url(self):
+        """
+        After successful creation, redirect to the new person's detail page.
+        """
+        return reverse_lazy("people:person_detail", kwargs={"pk": self.object.pk})
+
+
 class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Update an existing Person profile.
@@ -164,22 +212,11 @@ class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Person
 
     # The form used to update the person
-    from_class = PersonForm
+    form_class = PersonForm
     
     
 
-    # Fields that are allowed to be edited through this form
-    fields = [
-        "first_name",
-        "last_name",
-        "role",
-        "job_title",
-        "email",
-        "phone_number",
-        "team_name",
-        "department_name",
-    ]
-
+    
     # The HTML template used to render the edit form
     template_name = "people/person_form.html"
 
@@ -205,7 +242,20 @@ class PersonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         Redirect back to the person's detail page after a successful update.
         """
         return reverse_lazy("people:person_detail", kwargs={"pk": self.object.pk})
+    def get_context_data(self, **kwargs):
+        """
+        Add extra context so the shared form template can show
+        edit-specific titles and links.
+        """
+        context = super().get_context_data(**kwargs)
 
+        context["form_mode"] = "edit"
+        context["page_title"] = "Edit Profile"
+        context["page_subtitle"] = (
+            f"Update profile information for {self.object.first_name} {self.object.last_name}"
+        )
+
+        return context
 @login_required
 @require_POST
 def deactivate_person_view(request, pk):
