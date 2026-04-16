@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+   
+    <link rel="stylesheet" href="../.././static/main.css">
+    <link rel="stylesheet" href="../.././static/styling/main/mainTheme.css">
+    <!--Used for icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<body>
+    
+    <!--JS Hook for the dropdown menu-->
+    <script src="../../scripts/dropdown.js" defer></script>
+   
+    <div class="main-container">
+
+        <!--Sidebar which will be the same across pages-->
+        <div class="main-sidebar">
+            <img id="sidebar-sky-logo" src="../../static/assets/public/sky_logo.svg" alt="sky-logo">
+
+            <!--Icons/Menu Btns-->
+            <ul>
+                <li class="sidebar-btn" id="dashboard-btn"><i class="bi bi-house-fill"></i><span>Dashboard</span></li>
+                <li class="sidebar-btn" id="team-btn"><i class="bi bi-people-fill"></i><span>Teams</span></li>
+                <li class="sidebar-btn" id="organisation-btn"><i class="bi bi-bezier"></i><span>Organisation</span></li>
+                <li class="sidebar-btn  active" id="message-btn"><i class="bi bi-envelope-fill"></i><span>Messages</span></li>
+                <li class="sidebar-btn" id="schedule-btn"><i class="bi bi-calendar-fill"></i><span>Schedule</span></li>
+                <li class="sidebar-btn" id="report-btn"><i class="bi bi-card-text"></i><span>Reports</span></li>
+            </ul>
+
+        </div>
+
+        <!--Right side box holds topbar and the content part-->
+        <div class="content-box">
+
+            <!--Topbar-->
+            <div class="main-topbar">
+
+                <!--Shows uer name and says welcome on dashboard-->
+                <a id="welcome-text">Welcome, Calum!</a>
+
+                <!--Search bar-->
+                <div class="search-container">
+                    <!-- SVG icon -->
+                    <img src="../../static/assets/public/search.svg" alt="Search" class="search-icon">
+
+                    <!-- Input field -->
+                    <input 
+                        type="text" 
+                        placeholder="Search..." 
+                        class="search-input"
+                    >
+                </div>
+              
+                <!--Profile Icon-->
+                <div class="profile-card">
+                    <div class="profile-pic">
+                        <img src="../../static/assets/main/profile_example.JPG" alt="profile">
+                    </div>
+
+                   <a id="username">Calum Smith</a>
+                    <!--Dropdown button-->
+                    <div class="dropdown-toggle" id="dropdownToggle">▼</div>
+
+                    <!--Dropdown menu-->
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="#">View Profile</a>
+                        <a href="#">Settings</a>
+                        <a href="#">Log Out</a>
+                    </div>
+                </div>
+              
+
+            </div>
+            
+            <!--Main activity of code here-->
+            <div class="dash">
+                
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
