@@ -45,8 +45,11 @@ INSTALLED_APPS = [
     # the app for authentication  
     'accounts',
 
-    # the app for people modue
+    # the app for people module
     'people' , 
+
+    # the core app 
+    'core' , 
 ]
 
 MIDDLEWARE = [
@@ -127,7 +130,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # Where Django redirects users after successful login
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "core:home"
 
 # URL of the login page
 LOGIN_URL = "/login/"

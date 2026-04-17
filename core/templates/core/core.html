@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Sky Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="p-5 rounded bg-light shadow-sm">
+        <h1>Welcome {{ request.user.username }} to Sky Team Application</h1>
+        <p class="mt-3">
+            This is your home page. From here, you can navigate through the system using the menu on the left.
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path , include 
 from django.http import HttpResponse 
 
-def home_view( request ): 
-    return HttpResponse("Welcome to the Sky project home pqge.")
+
 
 urlpatterns = [
     path("admin/" , admin.site.urls ) , 
+
+    # Core (home/dashboard)
+    path("", include('core.urls')),
 
     # Authentication URLs 
     path("" , include("accounts.urls")) , 
@@ -30,6 +32,6 @@ urlpatterns = [
     # poeple module URLs 
     path("people/" , include("people.urls") ) , 
 
-    # home route 
-    path("" , home_view , name="home" ) , 
+    
 ]
+
