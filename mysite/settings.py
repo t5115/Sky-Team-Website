@@ -133,7 +133,10 @@ STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = "core:home"
 
 # URL of the login page
-LOGIN_URL = "/login/"
+LOGIN_URL = "CustomLoginView"
+
+# Where Django redirects users after logout
+LOGOUT_REDIRECT_URL = 'CustomLoginView'
 
 
 # Development email backend:

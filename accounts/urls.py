@@ -1,6 +1,6 @@
 from django.urls import path , reverse_lazy
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView , LogoutView
 from .views import request_registration_link_view, complete_registration_view
 from .forms import CustomPasswordResetForm , CustomSetPasswordForm
 
@@ -10,6 +10,7 @@ urlpatterns = [
         LoginView.as_view(template_name="accounts/login.html"),
         name="CustomLoginView",
     ),
+    path("logout/", LogoutView.as_view(), name="logout"),
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(
@@ -58,3 +59,4 @@ urlpatterns = [
     name="complete_registration",
 )
 ]
+

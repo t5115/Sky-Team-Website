@@ -437,16 +437,19 @@
         <p class="sidebar-section-title">My Account</p>
         <ul class="sidebar-nav">
             <li>
-                <a href="#" class="sidebar-link">
+                <a href="{% url 'people:my_profile' %}" class="sidebar-link">
                     <i class="bi bi-person-circle"></i>
                     <span>My Profile</span>
                 </a>
             </li>
             <li>
-                <a href="#" class="sidebar-link">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span>Logout</span>
-                </a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="sidebar-link w-100 border-0 bg-transparent text-start">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
             </li>
         </ul>
     </aside>
