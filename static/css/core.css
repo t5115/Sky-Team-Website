@@ -1,0 +1,140 @@
+.dashboard-page {
+    background: #ffffff;
+    min-height: calc(100vh - 140px);
+    margin: -32px -28px;
+    padding: 28px 36px 40px;
+}
+
+.dashboard-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 0 auto 30px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.action-btn:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    opacity: 0.96;
+}
+
+.action-btn i {
+    font-size: 1.1rem;
+}
+
+.action-orange {
+    background-color:  #e09625;
+}
+
+.action-purple {
+    background-color: #c44ee2;
+}
+
+.action-blue {
+    background: #3124e4;
+    color: #fff;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.dashboard-card {
+    background: #f3f3f3;
+    border-radius: 14px;
+    padding: 18px 16px 20px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+    min-height: 300px;
+}
+
+.dashboard-card-title {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2a2a2a;
+    margin-bottom: 18px;
+}
+
+.team-box {
+    background: #efefef;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    padding: 16px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.active-team {
+    border: 2px solid #5ea2ff;
+    background: #f7f7f7;
+}
+
+.team-icon {
+    color: #6b4fd3;
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.team-details h4 {
+    margin: 0 0 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #222;
+}
+
+.team-details p {
+    margin: 0 0 4px;
+    font-size: 0.84rem;
+    color: #4b5563;
+}
+
+.messages-box {
+    background: #efefef;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    min-height: 220px;
+    padding: 16px 18px;
+}
+
+.messages-list {
+    margin: 0;
+    padding-left: 18px;
+    color: #4b5563;
+}
+
+.messages-list li {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-page {
+        padding: 24px 18px 32px;
+        margin: -32px -20px;
+    }
+}
