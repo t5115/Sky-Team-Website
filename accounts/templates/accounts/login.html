@@ -1,7 +1,11 @@
-
 {% extends "base_public.html" %}
+{% load static %}
 
 {% block title %}Login{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %} 
 
 {% block content %}
 <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center sky-login-bg">
