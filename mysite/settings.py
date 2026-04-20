@@ -129,6 +129,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+   BASE_DIR / "static",
+]
+
+
 # Where Django redirects users after successful login
 LOGIN_REDIRECT_URL = "core:home"
 
