@@ -50,6 +50,9 @@ INSTALLED_APPS = [
 
     # the core app 
     'core' , 
+    
+    # the teams app
+    'teams',
 ]
 
 MIDDLEWARE = [

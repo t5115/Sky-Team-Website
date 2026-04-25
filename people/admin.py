@@ -1,8 +1,7 @@
 from django.contrib import admin
+from .models import Person
 
-# Register your models here.
-from .models import Person 
-
-admin.site.register( Person )
-
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    search_fields = ('first_name', 'last_name', 'email')
 
