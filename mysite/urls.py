@@ -32,6 +32,9 @@ urlpatterns = [
     # poeple module URLs 
     path("people/" , include("people.urls") ) , 
 
+    # teams module URLs
+    path("teams/" , include("teams.urls") ) ,
+
     
 ]
 
