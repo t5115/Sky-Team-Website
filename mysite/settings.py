@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     
     # the teams app
     'teams',
+    # the departments app
+    'departments',
 ]
 
 MIDDLEWARE = [
