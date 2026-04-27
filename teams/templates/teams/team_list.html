@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Team Directory - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Toolbar ── */
+  .teams-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .teams-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+    max-width: 340px;
+  }
+
+  .teams-search-wrap i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.92rem;
+    pointer-events: none;
+  }
+
+  .teams-search-input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
+    font-size: 0.92rem;
+    color: #374151;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .teams-search-input:focus {
+    border-color: #3b82f6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  .teams-select {
+    padding: 10px 36px 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%236b7280' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    -webkit-appearance: none;
+    font-size: 0.92rem;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 160px;
+  }
+
+  .teams-select:focus {
+    border-color: #3b82f6;
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .view-btn {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 1.05rem;
+  }
+
+  .view-btn.active,
+  .view-btn:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+  }
+
+  /* ── Grid layout ── */
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Team Card ── */
+  .team-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 22px 22px 18px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .team-card:hover {
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .team-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .team-card-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .team-status-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 10px;
+  }
+
+  .badge-active {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+  }
+
+  .badge-inactive {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+
+  .badge-archived {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+  }
+
+  .team-lead {
+    font-size: 0.88rem;
+    color: #3b82f6;
+    font-weight: 500;
+    margin: 0 0 14px;
+  }
+
+  .team-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .team-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #374151;
+  }
+
+  .team-meta-item i {
+    color: #6b7280;
+    font-size: 1rem;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Avatar Stack ── */
+  .avatar-stack {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .avatar-stack .av {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    margin-right: -10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  .av-1 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .av-2 { background: linear-gradient(135deg, #8b5cf6, #3b82f6); }
+  .av-3 { background: linear-gradient(135deg, #06b6d4, #10b981); }
+  .av-extra {
+    background: #e5e7eb;
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-right: 0;
+    margin-left: -10px;
+    border: 2px solid #fff;
+  }
+
+  /* ── Card Footer ── */
+  .team-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .btn-contact {
+    flex: 1;
+    padding: 9px 0;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-contact:hover {
+    background: #1d4ed8;
+  }
+
+  .btn-more {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .btn-more:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #374151;
+  }
+
+  /* ── Empty state ── */
+  .teams-empty {
+    text-align: center;
+    padding: 64px 24px;
+    color: #9ca3af;
+    grid-column: 1 / -1;
+  }
+
+  .teams-empty i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+    color: #d1d5db;
+  }
+
+  .teams-empty p {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* ── List view ── */
+  .teams-list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .team-list-row {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: box-shadow 0.15s;
+  }
+
+  .team-list-row:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+
+  .team-list-name {
+    font-weight: 700;
+    color: #1d4ed8;
+    font-size: 0.97rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .team-list-lead {
+    font-size: 0.87rem;
+    color: #6b7280;
+    flex: 1;
+  }
+
+  .team-list-meta {
+    display: flex;
+    gap: 18px;
+    flex-shrink: 0;
+  }
+
+  .team-list-meta span {
+    font-size: 0.85rem;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .team-list-meta i {
+    color: #9ca3af;
+    font-size: 0.9rem;
+  }
+
+  /* Default - grid view */
+  .view-grid .teams-list-view { display: none; }
+  .view-list .teams-grid { display: none; }
+  .view-list .teams-list-view { display: flex; }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Team Directory</h2>
+  <p class="page-subtitle">Browse and manage all teams in your organisation.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="teams-container" class="view-grid">
+
+  <!-- Toolbar -->
+  <form method="GET" action="" id="filter-form">
+    <div class="teams-toolbar">
+      <div class="teams-search-wrap">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          name="search"
+          class="teams-search-input"
+          placeholder="Search teams..."
+          value="{{ search_query }}"
+          autocomplete="off"
+          oninput="document.getElementById('filter-form').submit()"
+        />
+      </div>
+
+      <select name="department" class="teams-select" onchange="this.form.submit()">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+          <option value="{{ dept }}" {% if department_filter == dept %}selected{% endif %}>{{ dept }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="sort" class="teams-select" onchange="this.form.submit()">
+        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
+        <option value="members" {% if sort_by == 'members' %}selected{% endif %}>Sort by Members</option>
+        <option value="repos" {% if sort_by == 'repos' %}selected{% endif %}>Sort by Repos</option>
+      </select>
+
+      <div class="view-toggle">
+        <button type="button" class="view-btn active" id="btn-grid" onclick="setView('grid')" title="Grid view">
+          <i class="bi bi-grid"></i>
+        </button>
+        <button type="button" class="view-btn" id="btn-list" onclick="setView('list')" title="List view">
+          <i class="bi bi-list-ul"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  {% if teams|length %}
+
+  <!-- GRID VIEW -->
+  <div class="teams-grid">
+    {% for team in teams %}
+    <div class="team-card">
+      <div class="team-card-header">
+        <h3 class="team-card-name">{{ team.name }}</h3>
+        <span class="team-status-badge badge-{{ team.status }}">
+          {{ team.get_status_display }}
+        </span>
+      </div>
+
+      {% if team.lead_name %}
+      <p class="team-lead">{{ team.lead_name }}</p>
+      {% endif %}
+
+      <div class="team-meta">
+        <div class="team-meta-item">
+          <i class="bi bi-people-fill"></i>
+          <span>{{ team.member_count }} Member{% if team.member_count != 1 %}s{% endif %}</span>
+        </div>
+        <div class="team-meta-item">
+          <i class="bi bi-git"></i>
+          <span>{{ team.repository_count }} Repositor{% if team.repository_count != 1 %}ies{% endif %}</span>
+        </div>
+      </div>
+
+      <!-- Avatar stack (decorative, based on member count) -->
+      <div class="avatar-stack">
+        {% if team.member_count >= 1 %}<div class="av av-1">{{ team.name|slice:":1" }}</div>{% endif %}
+        {% if team.member_count >= 2 %}<div class="av av-2">{% if team.lead_name %}{{ team.lead_name|slice:":1" }}{% else %}B{% endif %}</div>{% endif %}
+        {% if team.member_count >= 3 %}<div class="av av-3">C</div>{% endif %}
+        {% if team.member_count > 3 %}
+        <div class="av av-extra">+{{ team.member_count|add:"-3" }}</div>
+        {% endif %}
+      </div>
+
+      <div class="team-card-footer">
+        <button class="btn-contact" type="button">Contact</button>
+        <button class="btn-more" type="button" title="More options">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- LIST VIEW -->
+  <div class="teams-list-view">
+    {% for team in teams %}
+    <div class="team-list-row">
+      <div class="team-list-name">{{ team.name }}</div>
+      <div class="team-list-lead">
+        {% if team.lead_name %}{{ team.lead_name }}{% else %}—{% endif %}
+      </div>
+      <span class="team-status-badge badge-{{ team.status }}">{{ team.get_status_display }}</span>
+      <div class="team-list-meta">
+        <span><i class="bi bi-people"></i> {{ team.member_count }}</span>
+        <span><i class="bi bi-git"></i> {{ team.repository_count }}</span>
+      </div>
+      <button class="btn-contact" type="button" style="width:100px;padding:7px 0;">Contact</button>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="teams-grid">
+    <div class="teams-empty">
+      <i class="bi bi-people"></i>
+      <p>
+        {% if search_query %}No teams found matching "{{ search_query }}".
+        {% else %}No teams yet. Add your first team via the admin panel.{% endif %}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  function setView(mode) {
+    const container = document.getElementById('teams-container');
+    container.className = 'view-' + mode;
+    document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+    document.getElementById('btn-list').classList.toggle('active', mode === 'list');
+    localStorage.setItem('teamsView', mode);
+  }
+
+  // Restore preference
+  const saved = localStorage.getItem('teamsView');
+  if (saved) setView(saved);
+</script>
+{% endblock %}
