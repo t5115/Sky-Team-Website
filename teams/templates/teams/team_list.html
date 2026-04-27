@@ -394,6 +394,7 @@
         <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
         <option value="members" {% if sort_by == 'members' %}selected{% endif %}>Sort by Members</option>
         <option value="repos" {% if sort_by == 'repos' %}selected{% endif %}>Sort by Repos</option>
+        <option value="dependencies" {% if sort_by == 'dependencies' %}selected{% endif %}>Sort by Dependencies</option>
       </select>
 
       <div class="view-toggle">
@@ -406,6 +407,12 @@
       </div>
     </div>
   </form>
+
+  <div class="mb-4">
+    <a href="{% url 'teams:team_dependency_overview' %}" class="btn btn-outline-primary">
+      <i class="bi bi-diagram-3"></i> View Team Dependencies
+    </a>
+  </div>
 
   {% if teams|length %}
 
@@ -420,8 +427,8 @@
         </span>
       </div>
 
-      {% if team.lead_name %}
-      <p class="team-lead">{{ team.lead_name }}</p>
+      {% if team.leader_name %}
+      <p class="team-lead">{{ team.leader_name }}</p>
       {% endif %}
 
       <div class="team-meta">
@@ -431,14 +438,22 @@
         </div>
         <div class="team-meta-item">
           <i class="bi bi-git"></i>
-          <span>{{ team.repository_count }} Repositor{% if team.repository_count != 1 %}ies{% endif %}</span>
+          <span>{{ team.repository_count|default:0 }} Repositor{% if team.repository_count != 1 %}ies{% endif %}</span>
+        </div>
+        <div class="team-meta-item">
+          <i class="bi bi-diagram-3"></i>
+          <span>{{ team.dependency_count }} Dependenc{% if team.dependency_count != 1 %}ies{% else %}y{% endif %}</span>
+        </div>
+        <div class="team-meta-item">
+          <i class="bi bi-arrow-down-up"></i>
+          <span>{{ team.dependent_team_count }} Dependent Team{% if team.dependent_team_count != 1 %}s{% endif %}</span>
         </div>
       </div>
 
       <!-- Avatar stack (decorative, based on member count) -->
       <div class="avatar-stack">
         {% if team.member_count >= 1 %}<div class="av av-1">{{ team.name|slice:":1" }}</div>{% endif %}
-        {% if team.member_count >= 2 %}<div class="av av-2">{% if team.lead_name %}{{ team.lead_name|slice:":1" }}{% else %}B{% endif %}</div>{% endif %}
+        {% if team.member_count >= 2 %}<div class="av av-2">{% if team.leader_name %}{{ team.leader_name|slice:":1" }}{% else %}B{% endif %}</div>{% endif %}
         {% if team.member_count >= 3 %}<div class="av av-3">C</div>{% endif %}
         {% if team.member_count > 3 %}
         <div class="av av-extra">+{{ team.member_count|add:"-3" }}</div>
@@ -446,10 +461,10 @@
       </div>
 
       <div class="team-card-footer">
-        <button class="btn-contact" type="button">Contact</button>
-        <button class="btn-more" type="button" title="More options">
-          <i class="bi bi-three-dots-vertical"></i>
-        </button>
+        <a class="btn-contact text-center" href="{% url 'teams:manage_team_dependencies' team.pk %}">Dependencies</a>
+        <a class="btn-more" href="{% url 'teams:manage_team_dependencies' team.pk %}" title="Manage dependencies">
+          <i class="bi bi-diagram-3"></i>
+        </a>
       </div>
     </div>
     {% endfor %}
@@ -461,14 +476,15 @@
     <div class="team-list-row">
       <div class="team-list-name">{{ team.name }}</div>
       <div class="team-list-lead">
-        {% if team.lead_name %}{{ team.lead_name }}{% else %}—{% endif %}
+        {% if team.leader_name %}{{ team.leader_name }}{% else %}—{% endif %}
       </div>
       <span class="team-status-badge badge-{{ team.status }}">{{ team.get_status_display }}</span>
       <div class="team-list-meta">
         <span><i class="bi bi-people"></i> {{ team.member_count }}</span>
-        <span><i class="bi bi-git"></i> {{ team.repository_count }}</span>
+        <span><i class="bi bi-git"></i> {{ team.repository_count|default:0 }}</span>
+        <span><i class="bi bi-diagram-3"></i> {{ team.dependency_count }}</span>
       </div>
-      <button class="btn-contact" type="button" style="width:100px;padding:7px 0;">Contact</button>
+      <a class="btn-contact text-center" href="{% url 'teams:manage_team_dependencies' team.pk %}" style="width:130px;padding:7px 0;">Dependencies</a>
     </div>
     {% endfor %}
   </div>

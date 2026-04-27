@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Manage {{ team.name }} Dependencies - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .dependency-page-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+  }
+
+  .dependency-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  }
+
+  .dependency-panel h3 {
+    color: #0f172a;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .dependency-row {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #f9fafb;
+  }
+
+  .dependency-row-title {
+    font-weight: 700;
+    color: #1d4ed8;
+    margin-bottom: 4px;
+  }
+
+  .dependency-row-reason {
+    color: #64748b;
+    font-size: 0.92rem;
+    margin-bottom: 10px;
+  }
+
+  .empty-note {
+    color: #9ca3af;
+    font-size: 0.95rem;
+  }
+
+  .messages-list {
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 991.98px) {
+    .dependency-page-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">{{ team.name }} Dependencies</h2>
+  <p class="page-subtitle">Manage which teams this team depends on and see which teams depend on it.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  <div class="messages-list">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+  <a href="{% url 'teams:team_list' %}" class="btn btn-outline-primary">
+    <i class="bi bi-arrow-left"></i> Back to Teams
+  </a>
+  <a href="{% url 'teams:team_dependency_overview' %}" class="btn btn-outline-secondary">
+    View All Dependencies
+  </a>
+</div>
+
+<div class="dependency-page-grid">
+  <div class="dependency-panel">
+    <h3>Teams that {{ team.name }} depends on</h3>
+
+    {% for dependency in dependencies %}
+      <div class="dependency-row">
+        <div class="dependency-row-title">
+          <i class="bi bi-arrow-right-circle"></i>
+          {{ dependency.required_team.name }}
+        </div>
+
+        {% if dependency.reason %}
+          <p class="dependency-row-reason">{{ dependency.reason }}</p>
+        {% else %}
+          <p class="dependency-row-reason">No reason provided.</p>
+        {% endif %}
+
+        {% if request.user.is_superuser %}
+          <form method="post" action="{% url 'teams:delete_team_dependency' team.pk dependency.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              Remove Dependency
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="empty-note">This team does not depend on any other teams yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="dependency-panel">
+    <h3>Teams that depend on {{ team.name }}</h3>
+
+    {% for dependency in dependent_teams %}
+      <div class="dependency-row">
+        <div class="dependency-row-title">
+          <i class="bi bi-arrow-left-circle"></i>
+          {{ dependency.dependent_team.name }}
+        </div>
+        {% if dependency.reason %}
+          <p class="dependency-row-reason">{{ dependency.reason }}</p>
+        {% else %}
+          <p class="dependency-row-reason">No reason provided.</p>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="empty-note">No other teams currently depend on this team.</p>
+    {% endfor %}
+
+    {% if request.user.is_superuser %}
+      <hr>
+      <h3>Add dependency</h3>
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.required_team.id_for_label }}">
+            {{ form.required_team.label }}
+          </label>
+          {{ form.required_team }}
+          {% for error in form.required_team.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.reason.id_for_label }}">
+            {{ form.reason.label }}
+          </label>
+          {{ form.reason }}
+          {% for error in form.reason.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          Add Dependency
+        </button>
+      </form>
+    {% else %}
+      <hr>
+      <p class="empty-note">Only superusers can add or remove dependencies.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
