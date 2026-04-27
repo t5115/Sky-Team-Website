@@ -34,6 +34,8 @@ urlpatterns = [
 
     # teams module URLs
     path("teams/" , include("teams.urls") ) ,
+    # departments module URLs
+    path("departments/" , include("departments.urls") ) ,
 
     
 ]

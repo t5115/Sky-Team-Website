@@ -25,7 +25,7 @@ def team_list(request):
         teams = teams.filter(name__icontains=search_query)
 
     if department_filter:
-        teams = teams.filter(department_name=department_filter)
+        teams = teams.filter(department__name=department_filter)
 
     if sort_by == 'repos':
         pass  # no repo count on Team yet — keep default ordering
@@ -34,13 +34,8 @@ def team_list(request):
     else:
         teams = teams.order_by('name')
 
-    departments = (
-        Team.objects
-        .exclude(department_name='')
-        .values_list('department_name', flat=True)
-        .distinct()
-        .order_by('department_name')
-    )
+    from departments.models import Department
+    departments = Department.objects.values_list('name', flat=True).order_by('name')
 
     context = {
         'teams': teams,

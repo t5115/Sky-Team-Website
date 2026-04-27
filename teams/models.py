@@ -16,6 +16,13 @@ class Team(models.Model):
         blank=True,
         related_name='led_teams',
     )
+    department = models.ForeignKey(
+        'departments.Department',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='department_teams',
+    )
     # ERD: department_id (FK) → Department (not yet built, use text for now)
     department_name = models.CharField(max_length=200, blank=True)
 

@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Departments - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .dept-toolbar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .dept-search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 340px; }
+  .dept-search-wrap i {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: #9ca3af; font-size: 0.92rem; pointer-events: none;
+  }
+  .dept-search-input {
+    width: 100%; padding: 10px 14px 10px 38px;
+    border: 1px solid #d1d5db; border-radius: 10px;
+    background: #f9fafb; font-size: 0.92rem; color: #374151;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .dept-search-input:focus {
+    border-color: #3b82f6; background: #fff;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  }
+  .dept-select {
+    padding: 10px 36px 10px 14px; border: 1px solid #d1d5db; border-radius: 10px;
+    background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%236b7280' d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    -webkit-appearance: none; font-size: 0.92rem; color: #374151;
+    outline: none; cursor: pointer; min-width: 160px;
+  }
+  .view-toggle { display: flex; gap: 4px; margin-left: auto; }
+  .view-btn {
+    width: 38px; height: 38px; border: 1px solid #d1d5db; border-radius: 8px;
+    background: #f9fafb; color: #6b7280;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; font-size: 1.05rem;
+  }
+  .view-btn.active, .view-btn:hover { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+  /* Grid */
+  .dept-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+  }
+
+  /* Card */
+  .dept-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 16px;
+    padding: 22px 22px 18px;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+    transition: box-shadow 0.2s, transform 0.2s; display: flex; flex-direction: column;
+  }
+  .dept-card:hover { box-shadow: 0 6px 20px rgba(15,23,42,0.1); transform: translateY(-2px); }
+  .dept-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+  .dept-card-name { font-size: 1.05rem; font-weight: 700; color: #1d4ed8; margin: 0; }
+
+  .dept-head { font-size: 0.88rem; color: #3b82f6; font-weight: 500; margin: 0 0 14px; }
+  .dept-head a { color: inherit; }
+  .dept-head a:hover { text-decoration: underline; }
+
+  .dept-meta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .dept-meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #374151; }
+  .dept-meta-item i { color: #6b7280; font-size: 1rem; width: 16px; text-align: center; }
+
+  /* Team pill chips */
+  .team-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; min-height: 28px; }
+  .team-chip {
+    font-size: 0.78rem; font-weight: 500; padding: 3px 10px;
+    background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .team-chip-extra {
+    font-size: 0.78rem; font-weight: 500; padding: 3px 10px;
+    background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb;
+    border-radius: 20px;
+  }
+  .no-teams { font-size: 0.82rem; color: #9ca3af; font-style: italic; margin-bottom: 16px; }
+
+  /* Footer */
+  .dept-card-footer { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+  .btn-contact {
+    flex: 1; padding: 9px 0; background: #2563eb; color: #fff;
+    border: none; border-radius: 10px; font-size: 0.92rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+    text-align: center; text-decoration: none; display: block;
+  }
+  .btn-contact:hover { background: #1d4ed8; color: #fff; }
+  .btn-more {
+    width: 36px; height: 36px; border: 1px solid #d1d5db; border-radius: 8px;
+    background: #fff; color: #6b7280;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; font-size: 1rem; flex-shrink: 0;
+  }
+  .btn-more:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+  /* Empty state */
+  .dept-empty { text-align: center; padding: 64px 24px; color: #9ca3af; grid-column: 1/-1; }
+  .dept-empty i { font-size: 3rem; margin-bottom: 12px; display: block; color: #d1d5db; }
+
+  /* List view */
+  .dept-list-view { display: flex; flex-direction: column; gap: 10px; }
+  .dept-list-row {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+    padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+    transition: box-shadow 0.15s; flex-wrap: wrap;
+  }
+  .dept-list-row:hover { box-shadow: 0 4px 12px rgba(15,23,42,0.08); }
+  .dept-list-name { font-weight: 700; color: #1d4ed8; font-size: 0.97rem; flex: 1; }
+  .dept-list-head { font-size: 0.87rem; color: #6b7280; flex: 1; }
+  .dept-list-meta { display: flex; gap: 18px; flex-shrink: 0; }
+  .dept-list-meta span { font-size: 0.85rem; color: #374151; display: flex; align-items: center; gap: 5px; }
+  .dept-list-meta i { color: #9ca3af; }
+
+  .view-grid .dept-list-view { display: none; }
+  .view-list .dept-grid     { display: none; }
+  .view-list .dept-list-view { display: flex; }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Departments</h2>
+  <p class="page-subtitle">Browse and manage all departments in your organisation.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="dept-container" class="view-grid">
+
+  <form method="GET" action="" id="filter-form">
+    <div class="dept-toolbar">
+      <div class="dept-search-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" name="search" class="dept-search-input"
+          placeholder="Search departments..." value="{{ search_query }}" autocomplete="off" />
+      </div>
+
+      <select name="sort" class="dept-select" onchange="this.form.submit()">
+        <option value="name"  {% if sort_by == 'name'  %}selected{% endif %}>Sort by Name</option>
+        <option value="teams" {% if sort_by == 'teams' %}selected{% endif %}>Sort by Teams</option>
+      </select>
+
+      <div class="view-toggle">
+        <button type="button" class="view-btn active" id="btn-grid" onclick="setView('grid')" title="Grid view">
+          <i class="bi bi-grid"></i>
+        </button>
+        <button type="button" class="view-btn" id="btn-list" onclick="setView('list')" title="List view">
+          <i class="bi bi-list-ul"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  {% if departments|length %}
+
+  <!-- GRID VIEW -->
+  <div class="dept-grid">
+    {% for dept in departments %}
+    <div class="dept-card">
+      <div class="dept-card-header">
+        <h3 class="dept-card-name">{{ dept.name }}</h3>
+      </div>
+
+      {% if dept.department_head %}
+        <p class="dept-head">
+          <a href="{% url 'people:person_detail' dept.department_head.pk %}">
+            {{ dept.department_head.first_name }} {{ dept.department_head.last_name }}
+          </a>
+        </p>
+      {% else %}
+        <p class="dept-head" style="color:#9ca3af;">No head assigned</p>
+      {% endif %}
+
+      <div class="dept-meta">
+        <div class="dept-meta-item">
+          <i class="bi bi-diagram-3-fill"></i>
+          <span>{{ dept.prefetched_teams|length }} Team{% if dept.prefetched_teams|length != 1 %}s{% endif %}</span>
+        </div>
+        {% if dept.description %}
+        <div class="dept-meta-item">
+          <i class="bi bi-info-circle"></i>
+          <span style="color:#6b7280;font-size:0.85rem;">{{ dept.description|truncatechars:60 }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Team chips -->
+      {% if dept.prefetched_teams %}
+      <div class="team-chips">
+        {% for team in dept.prefetched_teams|slice:":4" %}
+          <span class="team-chip">{{ team.name }}</span>
+        {% endfor %}
+        {% with total=dept.prefetched_teams|length %}
+          {% if total > 4 %}
+            <span class="team-chip-extra">+{{ total|add:"-4" }} more</span>
+          {% endif %}
+        {% endwith %}
+      </div>
+      {% else %}
+      <p class="no-teams">No teams assigned yet</p>
+      {% endif %}
+
+      <div class="dept-card-footer">
+        {% if dept.department_head and dept.department_head.email %}
+          <a href="mailto:{{ dept.department_head.email }}" class="btn-contact">Contact</a>
+        {% else %}
+          <button class="btn-contact" type="button">Contact</button>
+        {% endif %}
+        <button class="btn-more" type="button" title="More options">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- LIST VIEW -->
+  <div class="dept-list-view">
+    {% for dept in departments %}
+    <div class="dept-list-row">
+      <div class="dept-list-name">{{ dept.name }}</div>
+      <div class="dept-list-head">
+        {% if dept.department_head %}
+          <a href="{% url 'people:person_detail' dept.department_head.pk %}" style="color:#6b7280;">
+            {{ dept.department_head.first_name }} {{ dept.department_head.last_name }}
+          </a>
+        {% else %}—{% endif %}
+      </div>
+      <div class="dept-list-meta">
+        <span><i class="bi bi-diagram-3"></i> {{ dept.prefetched_teams|length }} team{% if dept.prefetched_teams|length != 1 %}s{% endif %}</span>
+      </div>
+      {% if dept.department_head and dept.department_head.email %}
+        <a href="mailto:{{ dept.department_head.email }}" class="btn-contact" style="flex:none;width:100px;padding:7px 0;">Contact</a>
+      {% else %}
+        <button class="btn-contact" type="button" style="flex:none;width:100px;padding:7px 0;">Contact</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="dept-grid">
+    <div class="dept-empty">
+      <i class="bi bi-building"></i>
+      <p>
+        {% if search_query %}
+          No departments found matching "{{ search_query }}".
+        {% else %}
+          No departments yet. A superuser can add departments via the
+          <a href="{% url 'admin:departments_department_add' %}">admin panel</a>.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  function setView(mode) {
+    document.getElementById('dept-container').className = 'view-' + mode;
+    document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+    document.getElementById('btn-list').classList.toggle('active', mode === 'list');
+    localStorage.setItem('deptView', mode);
+  }
+  const saved = localStorage.getItem('deptView');
+  if (saved) setView(saved);
+
+  document.querySelector('.dept-search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('filter-form').submit();
+  });
+</script>
+{% endblock %}
