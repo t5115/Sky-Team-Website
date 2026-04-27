@@ -54,7 +54,7 @@ urlpatterns = [
         name="request_registration_link",
     ),
     path(
-    "register/complete/<path:signed_email>/",
+    "register/complete/",
     complete_registration_view,
     name="complete_registration",
 )

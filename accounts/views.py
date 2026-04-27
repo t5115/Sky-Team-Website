@@ -1,47 +1,44 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import signing
 from django.core.mail import EmailMessage
-from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
-from .forms import RegistrationEmailRequestForm, CompleteRegistrationForm
+from urllib.parse import urlencode
 
 from django.contrib.auth.views import LoginView
-from .forms import CustomAuthenticationForm
+from .forms import (
+    RegistrationEmailRequestForm,
+    CompleteRegistrationForm,
+    CustomAuthenticationForm,
+)
+
 
 class CustomLoginView(LoginView):
     template_name = "accounts/login.html"
     authentication_form = CustomAuthenticationForm
 
+
 def request_registration_link_view(request):
-    """
-    Step 1:
-    Ask the user for an email address and, if appropriate,
-    send a time-limited registration link.
-    """
     if request.method == "POST":
         form = RegistrationEmailRequestForm(request.POST)
 
         if form.is_valid():
             email = form.cleaned_data["email"]
-
-            # Check whether the email already belongs to an existing user.
             user_exists = User.objects.filter(email__iexact=email).exists()
 
-            # Secure UX choice:
-            # We return the same response either way.
-            # If the email is not registered, we send the registration link.
             if not user_exists:
-                signer = TimestampSigner()
-                signed_email = signer.sign(email)
+                token = signing.dumps(email)
 
-                registration_path = reverse(
-                "complete_registration",
-                 kwargs={"signed_email": signed_email}
-                 )
-                registration_link = request.build_absolute_uri(registration_path)
-                print( registration_link )
+                registration_path = reverse("complete_registration")
+                query_string = urlencode({"token": token})
+                registration_link = request.build_absolute_uri(
+                    f"{registration_path}?{query_string}"
+                )
+
+                print(registration_link)
+
                 subject = "Complete your Sky project registration"
                 message = render_to_string(
                     "accounts/registration_link_email.txt",
@@ -50,7 +47,6 @@ def request_registration_link_view(request):
                         "email": email,
                     }
                 )
-                print(registration_link.replace("\n", "").replace("\r", ""))
 
                 email_message = EmailMessage(
                     subject=subject,
@@ -58,7 +54,7 @@ def request_registration_link_view(request):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     to=[email],
                 )
-                email_message.send() 
+                email_message.send()
 
             return render(request, "accounts/registration_link_sent.html")
     else:
@@ -71,24 +67,28 @@ def request_registration_link_view(request):
     )
 
 
-def complete_registration_view(request, signed_email):
-    """
-    Step 2:
-    Verify the signed email link and allow the user to set a password.
-    """
-    signer = TimestampSigner()
+def complete_registration_view(request):
+    token = request.GET.get("token")
 
-    try:
-        email = signer.unsign(
-            signed_email,
-            max_age=settings.REGISTRATION_LINK_MAX_AGE
-        )
-    except (BadSignature, SignatureExpired):
+    if not token:
         return render(request, "accounts/registration_link_invalid.html")
 
-    # Extra safety check in case the email became registered after the link was sent.
+    try:
+        email = signing.loads(
+            token,
+            max_age=settings.REGISTRATION_LINK_MAX_AGE
+        )
+    except signing.BadSignature:
+        return render(request, "accounts/registration_link_invalid.html")
+    except signing.SignatureExpired:
+        return render(request, "accounts/registration_link_invalid.html")
+
     if User.objects.filter(email__iexact=email).exists():
-        return render(request, "accounts/registration_email_already_used.html", {"email": email})
+        return render(
+            request,
+            "accounts/registration_email_already_used.html",
+            {"email": email}
+        )
 
     if request.method == "POST":
         form = CompleteRegistrationForm(request.POST)
@@ -96,13 +96,17 @@ def complete_registration_view(request, signed_email):
         if form.is_valid():
             password = form.cleaned_data["password1"]
 
-            user = User.objects.create_user(
-                username=email,   # Because default Django auth uses username
+            User.objects.create_user(
+                username=email,
                 email=email,
                 password=password
             )
 
-            return render(request, "accounts/registration_success.html", {"email": email})
+            return render(
+                request,
+                "accounts/registration_success.html",
+                {"email": email}
+            )
     else:
         form = CompleteRegistrationForm()
 

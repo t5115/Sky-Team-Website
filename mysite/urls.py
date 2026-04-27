@@ -36,6 +36,9 @@ urlpatterns = [
     path("teams/" , include("teams.urls") ) ,
     # departments module URLs
     path("departments/" , include("departments.urls") ) ,
+    
+    # messaging module URLs
+    path("messages/", include("messaging.urls")),
 
     # team resources URLs: /services/, /repositories/, /contact-channels/
     path("", include("resources.urls")),
