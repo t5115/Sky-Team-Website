@@ -55,6 +55,9 @@ INSTALLED_APPS = [
     'teams',
     # the departments app
     'departments',
+
+    # the resources app stores repositories, services, and contact channels owned by teams
+    'resources',
 ]
 
 MIDDLEWARE = [

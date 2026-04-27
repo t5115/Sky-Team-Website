@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from departments.models import Department
 from teams.models import Team, TeamDependency, TeamMembership
+from resources.models import TeamResource
 
 
 def home(request):
@@ -51,6 +52,13 @@ def organisation_diagram(request):
                 'dependent_teams',
                 queryset=TeamDependency.objects.select_related('dependent_team').order_by('dependent_team__name'),
                 to_attr='diagram_dependent_teams',
+            ),
+            # Active team resources are prefetched so the diagram can summarise
+            # services, repositories, and contact channels without extra queries.
+            Prefetch(
+                'resources',
+                queryset=TeamResource.objects.filter(is_active=True).order_by('resource_type', 'name'),
+                to_attr='diagram_resources',
             ),
         )
         .order_by('name')
@@ -107,6 +115,11 @@ def organisation_diagram(request):
         for department in departments
         for team in department.diagram_teams
     )
+    total_resources = sum(
+        len(team.diagram_resources)
+        for department in departments
+        for team in department.diagram_teams
+    )
 
     context = {
         'departments': departments,
@@ -119,5 +132,6 @@ def organisation_diagram(request):
         'total_teams': total_teams,
         'total_memberships': total_memberships,
         'total_dependencies': total_dependencies,
+        'total_resources': total_resources,
     }
     return render(request, 'core/organisation_diagram.html', context)

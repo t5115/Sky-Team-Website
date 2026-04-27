@@ -41,7 +41,7 @@
 
   .diagram-summary-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
     gap: 16px;
     margin-bottom: 24px;
   }
@@ -307,6 +307,26 @@
     gap: 10px;
   }
 
+  .resource-summary {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+
+  .resource-link-list {
+    display: grid;
+    gap: 6px;
+  }
+
+  .resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: #1d4ed8;
+    font-weight: 700;
+  }
+
   .dependency-label {
     font-size: 0.76rem;
     font-weight: 800;
@@ -422,6 +442,11 @@
     <i class="bi bi-arrow-left-right"></i>
     <p class="diagram-summary-value">{{ total_dependencies }}</p>
     <p class="diagram-summary-label">Team dependenc{{ total_dependencies|pluralize:"y,ies" }}</p>
+  </article>
+  <article class="diagram-summary-card">
+    <i class="bi bi-box-seam"></i>
+    <p class="diagram-summary-value">{{ total_resources }}</p>
+    <p class="diagram-summary-label">Active resource{{ total_resources|pluralize }}</p>
   </article>
 </section>
 
@@ -565,6 +590,32 @@
                       <span class="empty-small">No teams depend on this team</span>
                     {% endif %}
                   </div>
+                </div>
+
+                <div class="resource-summary">
+                  <div class="dependency-label">Resources</div>
+                  {% if team.diagram_resources %}
+                    <div class="resource-link-list">
+                      {% for resource in team.diagram_resources|slice:":3" %}
+                        {% if resource.url %}
+                          <a class="resource-link" href="{{ resource.url }}" target="_blank" rel="noopener noreferrer">
+                            {% if resource.resource_type == 'repository' %}<i class="bi bi-git"></i>{% elif resource.resource_type == 'service' %}<i class="bi bi-box-seam"></i>{% else %}<i class="bi bi-chat-left-text"></i>{% endif %}
+                            {{ resource.name }}
+                          </a>
+                        {% else %}
+                          <span class="resource-link">
+                            {% if resource.resource_type == 'repository' %}<i class="bi bi-git"></i>{% elif resource.resource_type == 'service' %}<i class="bi bi-box-seam"></i>{% else %}<i class="bi bi-chat-left-text"></i>{% endif %}
+                            {{ resource.name }}
+                          </span>
+                        {% endif %}
+                      {% endfor %}
+                      {% if team.diagram_resources|length > 3 %}
+                        <span class="empty-small">+ {{ team.diagram_resources|length|add:"-3" }} more resource{{ team.diagram_resources|length|add:"-3"|pluralize }}</span>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <span class="empty-small">No active resources added</span>
+                  {% endif %}
                 </div>
               </section>
             {% endfor %}
