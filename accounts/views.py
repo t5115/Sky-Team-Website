@@ -59,8 +59,6 @@ def request_registration_link_view(request):
                     to=[email],
                 )
                 email_message.send() 
-            else : 
-                return render(request, "accounts/registration_email_already_used.html")
 
             return render(request, "accounts/registration_link_sent.html")
     else:
