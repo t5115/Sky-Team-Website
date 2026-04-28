@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     # the resources app stores repositories, services, and contact channels owned by teams
     'resources',
     
-    # the messages app
     'messaging',
 ]
 
