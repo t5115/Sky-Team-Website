@@ -40,6 +40,9 @@ urlpatterns = [
     # team resources URLs: /services/, /repositories/, /contact-channels/
     path("", include("resources.urls")),
 
+    # organisation reports URLs
+    path("reports/", include("reports.urls")),
+
 ]
 
 

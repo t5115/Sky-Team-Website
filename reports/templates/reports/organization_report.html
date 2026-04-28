@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}Organisation Reports - Sky Portal{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Organisation Reports</h2>
+  <p class="page-subtitle">
+    Generate a clear summary of departments, teams, members, dependencies, and resources.
+  </p>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .report-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .report-generated {
+    color: #64748b;
+    margin: 0;
+  }
+
+  .report-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 600;
+  }
+
+  .report-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .report-stat-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+  }
+
+  .report-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #6d28d9;
+    font-size: 1.25rem;
+    margin-bottom: 14px;
+  }
+
+  .report-stat-label {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.92rem;
+  }
+
+  .report-stat-value {
+    margin: 4px 0 0;
+    color: #0f172a;
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+  .report-section {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    margin-bottom: 24px;
+  }
+
+  .report-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #0f172a;
+  }
+
+  .report-section-text {
+    color: #64748b;
+    margin-bottom: 18px;
+  }
+
+  .report-table {
+    margin-bottom: 0;
+  }
+
+  .report-table th {
+    color: #334155;
+    background: #f8fafc;
+    white-space: nowrap;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #475569;
+    text-transform: capitalize;
+  }
+
+  .status-pill.active {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-pill.inactive {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-pill.archived {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  @media (max-width: 1199.98px) {
+    .report-summary-grid {
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .report-summary-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-toolbar">
+  <p class="report-generated">
+    <i class="bi bi-clock-history"></i>
+    Generated at {{ generated_at|date:"d M Y, H:i" }}
+  </p>
+
+  <a href="{% url 'reports:download_organization_report_csv' %}" class="btn btn-primary report-download-btn">
+    <i class="bi bi-download"></i>
+    Download CSV Report
+  </a>
+</div>
+
+<div class="report-summary-grid">
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-building"></i></div>
+    <p class="report-stat-label">Departments</p>
+    <p class="report-stat-value">{{ totals.departments }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-people-fill"></i></div>
+    <p class="report-stat-label">Teams</p>
+    <p class="report-stat-value">{{ totals.teams }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-person-check"></i></div>
+    <p class="report-stat-label">Active People</p>
+    <p class="report-stat-value">{{ totals.active_people }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-link-45deg"></i></div>
+    <p class="report-stat-label">Team Dependencies</p>
+    <p class="report-stat-value">{{ totals.team_dependencies }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-check-circle"></i></div>
+    <p class="report-stat-label">Active Teams</p>
+    <p class="report-stat-value">{{ totals.active_teams }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-pause-circle"></i></div>
+    <p class="report-stat-label">Inactive Teams</p>
+    <p class="report-stat-value">{{ totals.inactive_teams }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-person-lines-fill"></i></div>
+    <p class="report-stat-label">Active Memberships</p>
+    <p class="report-stat-value">{{ totals.team_memberships }}</p>
+  </div>
+
+  <div class="report-stat-card">
+    <div class="report-stat-icon"><i class="bi bi-box-seam"></i></div>
+    <p class="report-stat-label">Active Resources</p>
+    <p class="report-stat-value">{{ totals.active_resources }}</p>
+  </div>
+</div>
+
+<div class="report-section">
+  <h3 class="report-section-title">Teams by Department</h3>
+  <p class="report-section-text">
+    This table shows how many teams are inside each department and how those teams are split by status.
+  </p>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle report-table">
+      <thead>
+        <tr>
+          <th>Department</th>
+          <th>Department Head</th>
+          <th>Total Teams</th>
+          <th>Active</th>
+          <th>Inactive</th>
+          <th>Archived</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for department in departments %}
+        <tr>
+          <td><strong>{{ department.name }}</strong></td>
+          <td>{{ department.head_name|default:"Not assigned" }}</td>
+          <td>{{ department.total_teams }}</td>
+          <td>{{ department.active_teams }}</td>
+          <td>{{ department.inactive_teams }}</td>
+          <td>{{ department.archived_teams }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">No departments found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="report-section">
+  <h3 class="report-section-title">Detailed Team Report</h3>
+  <p class="report-section-text">
+    This table gives a more detailed view of each team, including department, leader, members, resources, and dependency counts.
+  </p>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle report-table">
+      <thead>
+        <tr>
+          <th>Team</th>
+          <th>Department</th>
+          <th>Leader</th>
+          <th>Status</th>
+          <th>Members</th>
+          <th>Resources</th>
+          <th>Depends On</th>
+          <th>Depended On By</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teams %}
+        <tr>
+          <td><strong>{{ team.name }}</strong></td>
+          <td>{{ team.department.name|default:"No department" }}</td>
+          <td>{{ team.leader_name|default:"Not assigned" }}</td>
+          <td>
+            <span class="status-pill {{ team.status }}">{{ team.get_status_display }}</span>
+          </td>
+          <td>{{ team.active_member_count }}</td>
+          <td>{{ team.resource_count }}</td>
+          <td>{{ team.depends_on_count }}</td>
+          <td>{{ team.depended_on_by_count }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center text-muted py-4">No teams found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="report-section h-100">
+      <h3 class="report-section-title">Team Status Breakdown</h3>
+      <p class="report-section-text">Summary of teams by their current status.</p>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle report-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Total Teams</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in team_status_breakdown %}
+            <tr>
+              <td><span class="status-pill {{ item.status }}">{{ item.status }}</span></td>
+              <td>{{ item.total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="2" class="text-center text-muted py-4">No team statuses found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="report-section h-100">
+      <h3 class="report-section-title">Active Resources Breakdown</h3>
+      <p class="report-section-text">Summary of active repositories, services, and contact channels.</p>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle report-table">
+          <thead>
+            <tr>
+              <th>Resource Type</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in resource_breakdown %}
+            <tr>
+              <td>{{ item.resource_type|title }}</td>
+              <td>{{ item.total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="2" class="text-center text-muted py-4">No active resources found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
