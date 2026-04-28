@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Messages{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messages.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="messages-page">
+    <div class="messages-layout">
+        <div class="messages-sidebar">
+            <h3 class="messages-title">People</h3>
+
+            <div class="people-list">
+                {% for person in people %}
+                    {% if person.user %}
+                        <a href="{% url 'messaging:conversation' person.user.id %}?folder={{ folder }}"
+                           class="person-link {% if selected_user and selected_user.id == person.user.id %}active{% endif %}">
+                            <div>{{ person.first_name }} {{ person.last_name }}</div>
+                            <div class="person-email">{{ person.email }}</div>
+                        </a>
+                    {% endif %}
+                {% empty %}
+                    <p class="empty-state">No people available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="messages-panel">
+            <div class="message-folder-tabs">
+                {% if selected_user %}
+                    <a href="{% url 'messaging:conversation' selected_user.id %}?folder=inbox"
+                       class="folder-tab {% if folder == 'inbox' %}active{% endif %}">
+                        Inbox
+                    </a>
+                    <a href="{% url 'messaging:conversation' selected_user.id %}?folder=sent"
+                       class="folder-tab {% if folder == 'sent' %}active{% endif %}">
+                        Sent
+                    </a>
+                    <a href="{% url 'messaging:conversation' selected_user.id %}?folder=drafts"
+                       class="folder-tab {% if folder == 'drafts' %}active{% endif %}">
+                        Drafts
+                    </a>
+                {% else %}
+                    <a href="{% url 'messaging:message_list' %}?folder=inbox"
+                       class="folder-tab {% if folder == 'inbox' %}active{% endif %}">
+                        Inbox
+                    </a>
+                    <a href="{% url 'messaging:message_list' %}?folder=sent"
+                       class="folder-tab {% if folder == 'sent' %}active{% endif %}">
+                        Sent
+                    </a>
+                    <a href="{% url 'messaging:message_list' %}?folder=drafts"
+                       class="folder-tab {% if folder == 'drafts' %}active{% endif %}">
+                        Drafts
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if selected_user %}
+                <h3 class="messages-title">
+                    {% if folder == 'inbox' %}
+                        Inbox from {{ selected_user.username }}
+                    {% elif folder == 'sent' %}
+                        Sent to {{ selected_user.username }}
+                    {% else %}
+                        Drafts for {{ selected_user.username }}
+                    {% endif %}
+                </h3>
+
+                <div class="messages-scroll">
+                    {% for message in messages %}
+                        <div class="message-row {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                            <div class="message-bubble">
+                                {{ message.content }}
+                            </div>
+                            <div class="message-time">
+                                {{ message.timestamp }}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="empty-state">
+                            {% if folder == 'inbox' %}
+                                No inbox messages yet.
+                            {% elif folder == 'sent' %}
+                                No sent messages yet.
+                            {% else %}
+                                No drafts yet.
+                            {% endif %}
+                        </p>
+                    {% endfor %}
+                </div>
+
+                <form method="post" action="{% url 'messaging:send_message' selected_user.id %}" class="message-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+
+                    <div class="message-actions">
+                        <button type="submit" name="action" value="send" class="send-btn">
+                            Send
+                        </button>
+                        <button type="submit" name="action" value="draft" class="draft-btn">
+                            Save Draft
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <h3 class="messages-title">Messages</h3>
+                <p class="empty-state">Select a person to open this folder.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

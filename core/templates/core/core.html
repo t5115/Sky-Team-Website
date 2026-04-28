@@ -10,17 +10,17 @@
 {% block content %}
 <div class="dashboard-page">
     <div class="dashboard-actions">
-        <a href="#" class="action-btn action-orange">
+        <a href="{% url 'teams:team_list' %}" class="action-btn action-orange">
             <i class="bi bi-search"></i>
             <span>Browse Teams</span>
         </a>
-
+    
         <a href="#" class="action-btn action-purple">
             <i class="bi bi-file-earmark-text"></i>
             <span>Open Reports</span>
         </a>
-
-        <a href="#" class="action-btn action-blue">
+    
+        <a href="{% url 'messaging:message_list' %}" class="action-btn action-blue">
             <i class="bi bi-send-fill"></i>
             <span>Open Messages</span>
         </a>

@@ -291,8 +291,8 @@
            REUSABLE CARD
         ------------------------------ */
       .sky-card {
-        background-color: #c91c1c;
-        border: 1px solid #0051f3;
+        background-color:rgb(241, 241, 241);
+        border: 1px rgb(0, 0, 0);
         border-radius: 18px;
         padding: 24px;
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
@@ -405,6 +405,13 @@
             </a>
           </li>
         </ul>
+
+        <li>
+          <a href="{% url 'messaging:message_list' %}" class="sidebar-link">
+              <i class="bi bi-chat-left-text"></i>
+              <span>Messages</span>
+          </a>
+      </li>
 
         <p class="sidebar-section-title">Resources</p>
         <ul class="sidebar-nav">

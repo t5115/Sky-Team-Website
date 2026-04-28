@@ -59,4 +59,3 @@ urlpatterns = [
     name="complete_registration",
 )
 ]
-
