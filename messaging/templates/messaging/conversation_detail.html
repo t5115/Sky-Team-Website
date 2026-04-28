@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ conversation.display_title }} - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .chat-shell { max-width: 1150px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 20px; }
+  .chat-card, .participants-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 22px; box-shadow: 0 8px 24px rgba(15,23,42,.06); }
+  .chat-header { padding: 20px 22px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 14px; align-items: start; }
+  .chat-title { margin: 0; color: #0f172a; font-weight: 900; }
+  .chat-body { padding: 20px 22px; min-height: 430px; max-height: 620px; overflow-y: auto; background: #f8fafc; }
+  .message-row { display: flex; margin-bottom: 14px; }
+  .message-row.mine { justify-content: flex-end; }
+  .message-bubble { max-width: 72%; background: #fff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 12px 14px; }
+  .message-row.mine .message-bubble { background: #eff6ff; border-color: #bfdbfe; }
+  .message-meta { color: #64748b; font-size: .78rem; margin-bottom: 5px; }
+  .message-text { margin: 0; white-space: pre-wrap; color: #1f2937; }
+  .chat-form { padding: 18px 22px; border-top: 1px solid #e5e7eb; }
+  .participant-line { padding: 11px 0; border-bottom: 1px solid #e5e7eb; }
+  .participant-line:last-child { border-bottom: 0; }
+  .participants-card { padding: 20px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  @media (max-width: 991.98px) { .chat-shell { grid-template-columns: 1fr; } .message-bubble { max-width: 90%; } }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Conversation</h2>
+  <p class="page-subtitle">Secure internal messaging between users, groups, and teams.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="chat-shell">
+  <section class="chat-card">
+    <div class="chat-header">
+      <div>
+        <h3 class="chat-title">{{ conversation.display_title }}</h3>
+        <p class="text-muted mb-0">{{ conversation.get_conversation_type_display }}{% if conversation.team %} · {{ conversation.team.name }}{% endif %}</p>
+      </div>
+      <div class="actions">
+        {% if participant_link.is_archived %}
+          <form method="post" action="{% url 'messaging:unarchive' conversation.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" type="submit">Unarchive</button></form>
+        {% else %}
+          <form method="post" action="{% url 'messaging:archive' conversation.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Archive</button></form>
+        {% endif %}
+        {% if conversation.conversation_type != 'direct' %}
+          <form method="post" action="{% url 'messaging:leave' conversation.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit">Leave</button></form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="chat-body">
+      {% for msg in messages_list %}
+        <div class="message-row {% if msg.sender == request.user %}mine{% endif %}">
+          <div class="message-bubble">
+            <div class="message-meta">
+              <strong>{{ msg.sender.username }}</strong> · {{ msg.sent_at|date:"d M Y, H:i" }}{% if msg.edited_at %} · edited{% endif %}
+            </div>
+            <p class="message-text">{{ msg.safe_body }}</p>
+            {% if msg.attachment_url and not msg.is_deleted %}
+              <p class="mt-2 mb-0"><a href="{{ msg.attachment_url }}" target="_blank" rel="noopener">Open attachment link</a></p>
+            {% endif %}
+            {% if msg.sender == request.user and not msg.is_deleted %}
+              <form class="mt-2" method="post" action="{% url 'messaging:delete_message' msg.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-link text-danger p-0" type="submit">Delete</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted text-center mt-5">No messages yet.</p>
+      {% endfor %}
+    </div>
+
+    <form class="chat-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="mb-3">
+        {{ form.body }} {{ form.body.errors }}
+      </div>
+      <div class="row g-2 align-items-start">
+        <div class="col-md-9">{{ form.attachment_url }} {{ form.attachment_url.errors }}</div>
+        <div class="col-md-3 d-grid"><button class="btn btn-primary" type="submit"><i class="bi bi-send"></i> Send</button></div>
+      </div>
+    </form>
+  </section>
+
+  <aside class="participants-card">
+    <h5 class="fw-bold mb-3">Participants</h5>
+    {% for participant in participants %}
+      <div class="participant-line">
+        <strong>{{ participant.user.username }}</strong>
+        <div class="text-muted small">{{ participant.user.email|default:"No email" }} · {{ participant.get_role_display }}</div>
+      </div>
+    {% endfor %}
+  </aside>
+</div>
+{% endblock %}
