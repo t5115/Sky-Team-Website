@@ -32,6 +32,23 @@ urlpatterns = [
     # poeple module URLs 
     path("people/" , include("people.urls") ) , 
 
-    
+    # teams module URLs
+    path("teams/" , include("teams.urls") ) ,
+    # departments module URLs
+    path("departments/" , include("departments.urls") ) ,
+
+    # team resources URLs: /services/, /repositories/, /contact-channels/
+    path("", include("resources.urls")),
+
+    # organisation reports URLs
+    path("reports/", include("reports.urls")),
+
+    # team scheduling and meeting calendar URLs
+    path("schedule/", include("schedules.urls")),
+
+    # internal messaging URLs
+    path("messages/", include("messaging.urls")),
+
 ]
+
 

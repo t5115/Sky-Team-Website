@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Team Dependencies - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .dependency-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .dependency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .dependency-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  }
+
+  .dependency-card h3 {
+    color: #1d4ed8;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .dependency-section-title {
+    color: #374151;
+    font-weight: 700;
+    font-size: 0.92rem;
+    margin: 14px 0 8px;
+  }
+
+  .dependency-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dependency-list li {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 0.92rem;
+  }
+
+  .empty-note {
+    color: #9ca3af;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Team Dependencies</h2>
+  <p class="page-subtitle">View which teams depend on each other across the organisation.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="dependency-actions">
+  <a href="{% url 'teams:team_list' %}" class="btn btn-outline-primary">
+    <i class="bi bi-arrow-left"></i> Back to Teams
+  </a>
+</div>
+
+<div class="dependency-grid">
+  {% for team in teams %}
+    <div class="dependency-card">
+      <h3>{{ team.name }}</h3>
+
+      <p class="dependency-section-title">This team depends on</p>
+      {% if team.dependencies.all %}
+        <ul class="dependency-list">
+          {% for dependency in team.dependencies.all %}
+            <li>
+              <i class="bi bi-arrow-right-circle"></i>
+              {{ dependency.required_team.name }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-note">No dependencies recorded.</p>
+      {% endif %}
+
+      <p class="dependency-section-title">Teams depending on this team</p>
+      {% if team.dependent_teams.all %}
+        <ul class="dependency-list">
+          {% for dependency in team.dependent_teams.all %}
+            <li>
+              <i class="bi bi-arrow-left-circle"></i>
+              {{ dependency.dependent_team.name }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-note">No teams currently depend on this team.</p>
+      {% endif %}
+
+      <a href="{% url 'teams:manage_team_dependencies' team.pk %}" class="btn btn-primary btn-sm mt-3">
+        View Details
+      </a>
+    </div>
+  {% empty %}
+    <div class="dependency-card">
+      <p class="empty-note">No teams have been created yet.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

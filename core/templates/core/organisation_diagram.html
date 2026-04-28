@@ -1,0 +1,641 @@
+{% extends "base.html" %}
+
+{% block title %}Organisation Diagram - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  /*
+    Organisation Diagram
+    --------------------
+    This page is intentionally read-only. It visualises the current organisation
+    structure from the database instead of storing separate diagram data.
+  */
+
+  .diagram-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .diagram-btn {
+    border: 1px solid #dbeafe;
+    background: #ffffff;
+    color: #1d4ed8;
+    border-radius: 999px;
+    padding: 9px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s ease;
+  }
+
+  .diagram-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1e40af;
+  }
+
+  .diagram-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .diagram-summary-card {
+    background: linear-gradient(135deg, #ffffff, #f8fbff);
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  .diagram-summary-card i {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .diagram-summary-value {
+    font-size: 1.65rem;
+    line-height: 1;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px;
+  }
+
+  .diagram-summary-label {
+    color: #64748b;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .diagram-filter-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  }
+
+  .diagram-filters {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.5fr) minmax(180px, 1fr) minmax(160px, 0.8fr) auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .diagram-input,
+  .diagram-select {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 11px 13px;
+    color: #334155;
+    background: #f9fafb;
+    outline: none;
+  }
+
+  .diagram-input:focus,
+  .diagram-select:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  .diagram-submit {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .diagram-submit:hover {
+    background: #1d4ed8;
+  }
+
+  .diagram-board {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .department-node {
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.07);
+    overflow: hidden;
+  }
+
+  .department-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 22px 24px;
+    background: linear-gradient(135deg, #f8fafc, #eef6ff);
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .department-title-wrap {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .department-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+  }
+
+  .department-name {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  .department-description {
+    margin: 0;
+    color: #64748b;
+    max-width: 720px;
+    font-size: 0.94rem;
+  }
+
+  .department-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    align-items: flex-end;
+    color: #475569;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  .department-head-link {
+    color: #1d4ed8;
+    font-weight: 700;
+  }
+
+  .team-tree {
+    position: relative;
+    padding: 30px 24px 24px;
+  }
+
+  /* Vertical connector line from department to its teams. */
+  .team-tree::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 30px;
+    background: #cbd5e1;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .team-node {
+    position: relative;
+    border: 1px solid #dbeafe;
+    border-radius: 20px;
+    background: #ffffff;
+    padding: 18px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  }
+
+  .team-node::before {
+    content: "";
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    width: 2px;
+    height: 18px;
+    background: #cbd5e1;
+  }
+
+  .team-node-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .team-name {
+    margin: 0;
+    color: #1d4ed8;
+    font-weight: 800;
+    font-size: 1.02rem;
+  }
+
+  .status-pill {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    height: fit-content;
+  }
+
+  .status-active { background: #dcfce7; color: #166534; }
+  .status-inactive { background: #fef3c7; color: #92400e; }
+  .status-archived { background: #f1f5f9; color: #475569; }
+
+  .team-purpose {
+    color: #64748b;
+    font-size: 0.88rem;
+    min-height: 38px;
+    margin-bottom: 14px;
+  }
+
+  .team-facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .team-fact {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    color: #334155;
+    font-size: 0.88rem;
+  }
+
+  .team-fact i {
+    color: #64748b;
+    width: 18px;
+    text-align: center;
+    margin-top: 1px;
+  }
+
+  .dependency-box {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .resource-summary {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+
+  .resource-link-list {
+    display: grid;
+    gap: 6px;
+  }
+
+  .resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: #1d4ed8;
+    font-weight: 700;
+  }
+
+  .dependency-label {
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 5px;
+  }
+
+  .dependency-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .dependency-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .dependency-chip.supports {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border-color: #ddd6fe;
+  }
+
+  .empty-small {
+    color: #94a3b8;
+    font-size: 0.82rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 70px 24px;
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 24px;
+    color: #64748b;
+  }
+
+  .empty-state i {
+    display: block;
+    font-size: 3rem;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 991.98px) {
+    .diagram-summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .diagram-filters { grid-template-columns: 1fr 1fr; }
+    .department-header { flex-direction: column; }
+    .department-meta { align-items: flex-start; white-space: normal; }
+  }
+
+  @media (max-width: 575.98px) {
+    .diagram-summary-grid { grid-template-columns: 1fr; }
+    .diagram-filters { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    .sidebar, .topbar, .diagram-filter-card, .diagram-actions { display: none !important; }
+    .app-wrapper, .main-content { display: block; }
+    .page-content { padding: 0; }
+    .department-node, .diagram-summary-card { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Organisation Diagram</h2>
+  <p class="page-subtitle">
+    A visual summary of departments, teams, leaders, members, and team dependencies.
+  </p>
+  <div class="diagram-actions">
+    <button type="button" class="diagram-btn" onclick="window.print()">
+      <i class="bi bi-printer"></i> Print / Save as PDF
+    </button>
+    <a href="{% url 'teams:team_dependency_overview' %}" class="diagram-btn">
+      <i class="bi bi-diagram-2"></i> View Dependency Overview
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="diagram-summary-grid" aria-label="Organisation summary">
+  <article class="diagram-summary-card">
+    <i class="bi bi-building"></i>
+    <p class="diagram-summary-value">{{ total_departments }}</p>
+    <p class="diagram-summary-label">Department{{ total_departments|pluralize }}</p>
+  </article>
+  <article class="diagram-summary-card">
+    <i class="bi bi-people-fill"></i>
+    <p class="diagram-summary-value">{{ total_teams }}</p>
+    <p class="diagram-summary-label">Team{{ total_teams|pluralize }}</p>
+  </article>
+  <article class="diagram-summary-card">
+    <i class="bi bi-person-lines-fill"></i>
+    <p class="diagram-summary-value">{{ total_memberships }}</p>
+    <p class="diagram-summary-label">Active membership{{ total_memberships|pluralize }}</p>
+  </article>
+  <article class="diagram-summary-card">
+    <i class="bi bi-arrow-left-right"></i>
+    <p class="diagram-summary-value">{{ total_dependencies }}</p>
+    <p class="diagram-summary-label">Team dependenc{{ total_dependencies|pluralize:"y,ies" }}</p>
+  </article>
+  <article class="diagram-summary-card">
+    <i class="bi bi-box-seam"></i>
+    <p class="diagram-summary-value">{{ total_resources }}</p>
+    <p class="diagram-summary-label">Active resource{{ total_resources|pluralize }}</p>
+  </article>
+</section>
+
+<section class="diagram-filter-card" aria-label="Diagram filters">
+  <form method="get" class="diagram-filters">
+    <input
+      type="text"
+      name="search"
+      class="diagram-input"
+      placeholder="Search by department, team, leader, or purpose..."
+      value="{{ search_query }}"
+      autocomplete="off"
+    />
+
+    <select name="department" class="diagram-select">
+      <option value="">All departments</option>
+      {% for department in all_departments %}
+        <option value="{{ department.pk }}" {% if department_id|stringformat:"s" == department.pk|stringformat:"s" %}selected{% endif %}>
+          {{ department.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="status" class="diagram-select">
+      <option value="">All team statuses</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="diagram-submit">
+      <i class="bi bi-funnel"></i> Apply Filters
+    </button>
+  </form>
+</section>
+
+{% if departments %}
+<section class="diagram-board" aria-label="Department and team diagram">
+  {% for department in departments %}
+    <article class="department-node">
+      <header class="department-header">
+        <div class="department-title-wrap">
+          <div class="department-icon">
+            <i class="bi bi-building"></i>
+          </div>
+          <div>
+            <h3 class="department-name">{{ department.name }}</h3>
+            {% if department.description %}
+              <p class="department-description">{{ department.description }}</p>
+            {% else %}
+              <p class="department-description">No department description has been added yet.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="department-meta">
+          <span>
+            <i class="bi bi-person-badge"></i>
+            Head:
+            {% if department.department_head %}
+              <a class="department-head-link" href="{% url 'people:person_detail' department.department_head.pk %}">
+                {{ department.department_head.first_name }} {{ department.department_head.last_name }}
+              </a>
+            {% else %}
+              <strong>Not assigned</strong>
+            {% endif %}
+          </span>
+          <span>
+            <i class="bi bi-diagram-3"></i>
+            {{ department.diagram_teams|length }} team{{ department.diagram_teams|length|pluralize }} shown
+          </span>
+        </div>
+      </header>
+
+      {% if department.diagram_teams %}
+        <div class="team-tree">
+          <div class="team-grid">
+            {% for team in department.diagram_teams %}
+              <section class="team-node">
+                <div class="team-node-header">
+                  <h4 class="team-name">{{ team.name }}</h4>
+                  <span class="status-pill status-{{ team.status }}">{{ team.get_status_display }}</span>
+                </div>
+
+                <p class="team-purpose">
+                  {% if team.purpose_description %}
+                    {{ team.purpose_description|truncatechars:110 }}
+                  {% else %}
+                    No team purpose has been added yet.
+                  {% endif %}
+                </p>
+
+                <div class="team-facts">
+                  <div class="team-fact">
+                    <i class="bi bi-person-check"></i>
+                    <span>
+                      Leader:
+                      {% if team.team_leader %}
+                        <a href="{% url 'people:person_detail' team.team_leader.pk %}">
+                          {{ team.team_leader.first_name }} {{ team.team_leader.last_name }}
+                        </a>
+                      {% else %}
+                        <strong>Not assigned</strong>
+                      {% endif %}
+                    </span>
+                  </div>
+
+                  <div class="team-fact">
+                    <i class="bi bi-people"></i>
+                    <span>{{ team.diagram_active_memberships|length }} active member{{ team.diagram_active_memberships|length|pluralize }}</span>
+                  </div>
+                </div>
+
+                <div class="dependency-box">
+                  <div>
+                    <div class="dependency-label">Depends on</div>
+                    {% if team.diagram_dependencies %}
+                      <div class="dependency-chips">
+                        {% for dependency in team.diagram_dependencies %}
+                          <span class="dependency-chip">
+                            <i class="bi bi-arrow-right"></i> {{ dependency.required_team.name }}
+                          </span>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <span class="empty-small">No dependencies</span>
+                    {% endif %}
+                  </div>
+
+                  <div>
+                    <div class="dependency-label">Supports</div>
+                    {% if team.diagram_dependent_teams %}
+                      <div class="dependency-chips">
+                        {% for dependency in team.diagram_dependent_teams %}
+                          <span class="dependency-chip supports">
+                            <i class="bi bi-arrow-left"></i> {{ dependency.dependent_team.name }}
+                          </span>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <span class="empty-small">No teams depend on this team</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="resource-summary">
+                  <div class="dependency-label">Resources</div>
+                  {% if team.diagram_resources %}
+                    <div class="resource-link-list">
+                      {% for resource in team.diagram_resources|slice:":3" %}
+                        {% if resource.url %}
+                          <a class="resource-link" href="{{ resource.url }}" target="_blank" rel="noopener noreferrer">
+                            {% if resource.resource_type == 'repository' %}<i class="bi bi-git"></i>{% elif resource.resource_type == 'service' %}<i class="bi bi-box-seam"></i>{% else %}<i class="bi bi-chat-left-text"></i>{% endif %}
+                            {{ resource.name }}
+                          </a>
+                        {% else %}
+                          <span class="resource-link">
+                            {% if resource.resource_type == 'repository' %}<i class="bi bi-git"></i>{% elif resource.resource_type == 'service' %}<i class="bi bi-box-seam"></i>{% else %}<i class="bi bi-chat-left-text"></i>{% endif %}
+                            {{ resource.name }}
+                          </span>
+                        {% endif %}
+                      {% endfor %}
+                      {% if team.diagram_resources|length > 3 %}
+                        <span class="empty-small">+ {{ team.diagram_resources|length|add:"-3" }} more resource{{ team.diagram_resources|length|add:"-3"|pluralize }}</span>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <span class="empty-small">No active resources added</span>
+                  {% endif %}
+                </div>
+              </section>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state" style="margin: 24px;">
+          <i class="bi bi-diagram-3"></i>
+          <strong>No teams to display for this department.</strong>
+          <p class="mb-0">Try changing the filters or adding teams to this department.</p>
+        </div>
+      {% endif %}
+    </article>
+  {% endfor %}
+</section>
+{% else %}
+<section class="empty-state">
+  <i class="bi bi-search"></i>
+  <strong>No organisation structure found.</strong>
+  <p class="mb-0">Try changing your filters or adding departments and teams first.</p>
+</section>
+{% endif %}
+{% endblock %}

@@ -50,6 +50,23 @@ INSTALLED_APPS = [
 
     # the core app 
     'core' , 
+    
+    # the teams app
+    'teams',
+    # the departments app
+    'departments',
+
+    # the resources app stores repositories, services, and contact channels owned by teams
+    'resources',
+
+    # the reports app generates organisation summary reports from existing data
+    'reports',
+
+    # the schedules app allows teams to plan and manage meetings on a calendar
+    'schedules',
+
+    # the messaging app allows users to communicate through direct, group, and team conversations
+    'messaging',
 ]
 
 MIDDLEWARE = [

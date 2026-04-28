@@ -263,6 +263,249 @@
                 height: 90px;
             }
         }
+           margin: 0;
+           min-height: 100vh;
+           font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+           background: linear-gradient(to right, #b45acb 0 48%, #f7f7f7 48% 100%);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           padding: 0;
+       }
+  
+       .auth-container {
+           width: 100%;
+           max-width: 1150px;
+           min-height: 100vh;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           padding: 0;
+       }
+  
+       .auth-card {
+           position: relative;
+           width: 100%;
+           min-height: 100vh;
+           background: transparent;
+           border-radius: 0;
+           padding: 0;
+           box-shadow: none;
+           border: none;
+           display: flex;
+           justify-content: flex-end;
+           align-items: center;
+           overflow: hidden;
+       }
+  
+       .auth-card::before {
+           content: "";
+           position: absolute;
+           inset: 0 auto 0 0;
+           width: 48%;
+           background-color: #b45acb;
+           background-image: url("{% static 'assets/login_page/login-man.png' %}");
+           background-repeat: no-repeat;
+           background-position: center bottom;
+           background-size: contain;
+           z-index: 0;
+       }
+  
+       .auth-card::after {
+           content: "";
+           position: absolute;
+           inset: 0 0 0 auto;
+           width: 52%;
+           background: #f7f7f7;
+           border-left: 1px solid #e3e3e3;
+           z-index: 0;
+       }
+  
+       .brand-area,
+       .auth-card > :not(.brand-area) {
+           position: relative;
+           z-index: 2;
+       }
+  
+       .brand-area {
+           width: 40%;
+           margin-left: auto;
+           margin-right: 6%;
+           text-align: center;
+           margin-bottom: 3rem;
+       }
+  
+       .brand-area::before {
+           content: "";
+           display: block;
+           width: 190px;
+           height: 110px;
+           margin: 0 auto 10px;
+           background-image: url("{% static 'assets/login_page/login-man.png' %}");
+           background-repeat: no-repeat;
+           background-position: center;
+           background-size: contain;
+       }
+  
+       .brand-icon {
+           display: none;
+       }
+  
+       .brand-title {
+           display: none;
+       }
+  
+       .brand-subtitle {
+           margin: 0;
+           color: #6b7280;
+           font-size: 1rem;
+       }
+  
+       .sky-login-card {
+           position: relative;
+           z-index: 2;
+           width: 40% !important;
+           max-width: none !important;
+           margin-right: 6%;
+           margin-left: auto;
+           background: transparent !important;
+           box-shadow: none !important;
+           border: none !important;
+           border-radius: 0 !important;
+           padding: 0 !important;
+       }
+  
+       .sky-login-card .text-center.mb-4 {
+           text-align: center !important;
+           margin-bottom: 2.2rem !important;
+       }
+  
+       .sky-login-card h1.h3 {
+           font-size: 2.7rem;
+           font-weight: 700;
+           color: #222;
+           margin-bottom: 0.5rem !important;
+       }
+  
+       .sky-login-card .text-muted {
+           color: #7b7b7b !important;
+           font-size: 1rem;
+       }
+  
+       .sky-login-card .alert {
+           border-radius: 8px;
+           margin-bottom: 1.2rem;
+       }
+  
+       .sky-login-card .form-label {
+           display: block;
+           margin-bottom: 8px;
+           font-weight: 600;
+           color: #2b2b2b;
+           font-size: 1rem;
+           text-align: left;
+       }
+  
+       .sky-login-card input,
+       .sky-login-card select,
+       .sky-login-card textarea {
+           width: 100%;
+           height: 74px;
+           padding: 0 20px;
+           border: 1px solid #d7d7d7;
+           border-radius: 6px;
+           background-color: #f7f7f7;
+           outline: none;
+           transition: 0.2s ease;
+           font-size: 1rem;
+           box-shadow: none;
+       }
+  
+       .sky-login-card input:focus,
+       .sky-login-card select:focus,
+       .sky-login-card textarea:focus {
+           border-color: #cfa2dd;
+           background-color: #ffffff;
+           box-shadow: none;
+       }
+  
+       .sky-btn,
+       .auth-btn {
+           width: 100%;
+           height: 72px;
+           border: none;
+           border-radius: 8px;
+           background: #d8aee4 !important;
+           color: #ffffff !important;
+           font-weight: 500;
+           font-size: 1.1rem;
+           transition: 0.2s ease;
+           box-shadow: none;
+           margin-top: 0.8rem;
+       }
+  
+       .sky-btn:hover,
+       .auth-btn:hover {
+           background: #cb9edb !important;
+           opacity: 1;
+       }
+  
+       .sky-link,
+       .auth-footer a {
+           color: #9dbfe9 !important;
+           text-decoration: none;
+           font-weight: 500;
+       }
+  
+       .sky-link:hover,
+       .auth-footer a:hover {
+           color: #7ea9df !important;
+       }
+  
+       .auth-footer {
+           text-align: center;
+           margin-top: 20px;
+           font-size: 0.94rem;
+           color: #64748b;
+       }
+  
+       @media (max-width: 900px) {
+           body {
+               background: #f7f7f7;
+               padding: 24px;
+           }
+  
+           .auth-container {
+               min-height: auto;
+               max-width: 520px;
+           }
+  
+           .auth-card {
+               min-height: auto;
+               background: #f7f7f7;
+               border-radius: 20px;
+               box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+               padding: 2rem 1.5rem;
+               display: block;
+           }
+  
+           .auth-card::before,
+           .auth-card::after {
+               display: none;
+           }
+  
+           .brand-area,
+           .sky-login-card {
+               width: 100% !important;
+               margin-left: 0 !important;
+               margin-right: 0 !important;
+           }
+  
+           .sky-login-card h1.h3 {
+               font-size: 2rem;
+           }
+       }
+
     </style>
 
     {% block extra_css %}{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}New Message - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .message-form-shell { max-width: 900px; margin: 0 auto; }
+  .message-form-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 22px; padding: 26px; box-shadow: 0 8px 24px rgba(15,23,42,.06); }
+  .helptext, .help-text { color: #64748b; font-size: .88rem; margin-top: 4px; }
+  .errorlist { color: #dc2626; margin: 6px 0 0; padding-left: 18px; font-size: .9rem; }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">New Message</h2>
+  <p class="page-subtitle">Create a direct message, group chat, or team conversation.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="message-form-shell">
+  <div class="message-form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.mode.id_for_label }}">Conversation type</label>
+          {{ form.mode }} {{ form.mode.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.title.id_for_label }}">Title</label>
+          {{ form.title }} {{ form.title.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.recipient.id_for_label }}">Direct recipient</label>
+          {{ form.recipient }} {{ form.recipient.errors }}
+          <div class="help-text">Use this for a one-to-one conversation.</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.team.id_for_label }}">Team</label>
+          {{ form.team }} {{ form.team.errors }}
+          <div class="help-text">Use this to start a team chat with active linked team members.</div>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold" for="{{ form.participants.id_for_label }}">Group participants</label>
+          {{ form.participants }} {{ form.participants.errors }}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold" for="{{ form.first_message.id_for_label }}">First message</label>
+          {{ form.first_message }} {{ form.first_message.errors }}
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <a class="btn btn-outline-secondary" href="{% url 'messaging:inbox' %}">Cancel</a>
+        <button class="btn btn-primary" type="submit">Create Conversation</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

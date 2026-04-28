@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}{{ config.title }} - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  /*
+    Resource list page
+    ------------------
+    This template is shared by Services, Repositories, and Contact Channels.
+    The backend sends the correct page configuration for the selected type.
+  */
+  .resource-toolbar {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  }
+
+  .resource-filters {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.3fr) minmax(170px, 0.9fr) minmax(170px, 0.9fr) minmax(130px, 0.7fr) auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .resource-input,
+  .resource-select {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 10px 13px;
+    background: #f9fafb;
+    color: #334155;
+    outline: none;
+  }
+
+  .resource-input:focus,
+  .resource-select:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 18px;
+  }
+
+  .resource-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .resource-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .resource-title-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .resource-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+
+  .resource-name {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .resource-team {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+
+  .status-pill {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .status-active { background: #dcfce7; color: #166534; }
+  .status-inactive { background: #f1f5f9; color: #475569; }
+
+  .resource-description {
+    color: #475569;
+    font-size: 0.92rem;
+    margin: 0;
+    min-height: 42px;
+  }
+
+  .resource-meta {
+    display: grid;
+    gap: 8px;
+    color: #334155;
+    font-size: 0.9rem;
+  }
+
+  .resource-meta-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .resource-meta-row i {
+    color: #64748b;
+    width: 18px;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .resource-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 14px;
+  }
+
+  .empty-resource-state {
+    text-align: center;
+    padding: 70px 24px;
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 24px;
+    color: #64748b;
+  }
+
+  .empty-resource-state i {
+    display: block;
+    font-size: 3rem;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 991.98px) {
+    .resource-filters { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 575.98px) {
+    .resource-filters { grid-template-columns: 1fr; }
+    .resource-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">{{ config.title }}</h2>
+  <p class="page-subtitle">{{ config.description }}</p>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div class="btn-group" role="group" aria-label="Resource type navigation">
+    <a href="{% url 'resources:service_list' %}" class="btn btn-outline-primary {% if resource_type == 'service' %}active{% endif %}">Services</a>
+    <a href="{% url 'resources:repository_list' %}" class="btn btn-outline-primary {% if resource_type == 'repository' %}active{% endif %}">Repositories</a>
+    <a href="{% url 'resources:contact_channel_list' %}" class="btn btn-outline-primary {% if resource_type == 'contact_channel' %}active{% endif %}">Contact Channels</a>
+  </div>
+
+  {% if request.user.is_superuser %}
+    <a href="{% url 'resources:resource_create' resource_type %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Add {{ config.singular }}
+    </a>
+  {% endif %}
+</div>
+
+<section class="resource-toolbar" aria-label="Resource filters">
+  <form method="get" class="resource-filters">
+    <input
+      type="text"
+      name="search"
+      class="resource-input"
+      placeholder="Search by name, team, URL, or description..."
+      value="{{ search_query }}"
+      autocomplete="off"
+    />
+
+    <select name="department" class="resource-select">
+      <option value="">All departments</option>
+      {% for department in departments %}
+        <option value="{{ department.pk }}" {% if department_id|stringformat:"s" == department.pk|stringformat:"s" %}selected{% endif %}>
+          {{ department.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="team" class="resource-select">
+      <option value="">All teams</option>
+      {% for team in teams %}
+        <option value="{{ team.pk }}" {% if team_id|stringformat:"s" == team.pk|stringformat:"s" %}selected{% endif %}>
+          {{ team.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="status" class="resource-select">
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+      <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+      <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-funnel"></i> Filter
+    </button>
+  </form>
+</section>
+
+{% if resources %}
+  <section class="resource-grid" aria-label="{{ config.title }} list">
+    {% for resource in resources %}
+      <article class="resource-card">
+        <header class="resource-card-header">
+          <div class="resource-title-wrap">
+            <div class="resource-icon">
+              <i class="bi {{ config.icon }}"></i>
+            </div>
+            <div>
+              <h3 class="resource-name">{{ resource.name }}</h3>
+              <p class="resource-team">{{ resource.team.name }}</p>
+            </div>
+          </div>
+          {% if resource.is_active %}
+            <span class="status-pill status-active">Active</span>
+          {% else %}
+            <span class="status-pill status-inactive">Inactive</span>
+          {% endif %}
+        </header>
+
+        {% if resource.description %}
+          <p class="resource-description">{{ resource.description|truncatechars:140 }}</p>
+        {% else %}
+          <p class="resource-description">No description has been added yet.</p>
+        {% endif %}
+
+        <div class="resource-meta">
+          <div class="resource-meta-row">
+            <i class="bi bi-building"></i>
+            <span>
+              Department:
+              {% if resource.team.department %}
+                {{ resource.team.department.name }}
+              {% else %}
+                Not assigned
+              {% endif %}
+            </span>
+          </div>
+
+          {% if resource.url %}
+            <div class="resource-meta-row">
+              <i class="bi bi-link-45deg"></i>
+              <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer">Open resource</a>
+            </div>
+          {% endif %}
+
+          {% if resource.contact_detail %}
+            <div class="resource-meta-row">
+              <i class="bi bi-chat-left-text"></i>
+              <span>{{ resource.contact_detail }}</span>
+            </div>
+          {% endif %}
+        </div>
+
+        {% if request.user.is_superuser %}
+          <div class="resource-actions">
+            <a href="{% url 'resources:resource_update' resource.pk %}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+
+            {% if resource.is_active %}
+              <form method="post" action="{% url 'resources:resource_deactivate' resource.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                  Deactivate
+                </button>
+              </form>
+            {% else %}
+              <form method="post" action="{% url 'resources:resource_reactivate' resource.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-success btn-sm">
+                  Reactivate
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="empty-resource-state">
+    <i class="bi {{ config.icon }}"></i>
+    <strong>No {{ config.title|lower }} found.</strong>
+    <p class="mb-0">Try changing the filters or ask a superuser to add resources for the relevant teams.</p>
+  </section>
+{% endif %}
+{% endblock %}

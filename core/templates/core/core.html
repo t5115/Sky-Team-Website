@@ -1,14 +1,70 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Home - Sky Portal{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/core.css' %}">
+{% endblock %}  
+
 {% block content %}
-<div class="container py-5">
-    <div class="p-5 rounded bg-light shadow-sm">
-        <h1>Welcome {{ request.user.username }} to Sky Team Application</h1>
-        <p class="mt-3">
-            This is your home page. From here, you can navigate through the system using the menu on the left.
-        </p>
+<div class="dashboard-page">
+    <div class="dashboard-actions">
+        <a href="{% url 'teams:team_list' %}" class="action-btn action-orange">
+            <i class="bi bi-search"></i>
+            <span>Browse Teams</span>
+        </a>
+
+        <a href="{% url 'reports:organization_report' %}" class="action-btn action-purple">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Open Reports</span>
+        </a>
+
+        <a href="#" class="action-btn action-blue">
+            <i class="bi bi-send-fill"></i>
+            <span>Open Messages</span>
+        </a>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <h3 class="dashboard-card-title">Team Overview</h3>
+
+            <div class="team-box active-team">
+                <div class="team-icon">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+                <div class="team-details">
+                    <h4>Data Engineering</h4>
+                    <p>Manager: Scott Wilkinson</p>
+                    <p>Members: 8</p>
+                </div>
+            </div>
+
+            <div class="team-box">
+                <div class="team-icon">
+                    <i class="bi bi-cloud-fill"></i>
+                </div>
+                <div class="team-details">
+                    <h4>Cloud Infrastructure</h4>
+                    <p>Manager: Alex Morgan</p>
+                    <p>Members: 9</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3 class="dashboard-card-title">Messages</h3>
+
+            <div class="messages-box">
+                <ul class="messages-list">
+                    <li>New update from Security Team</li>
+                    <li>Reminder: team standup at 10:00 AM</li>
+                    <li>Infrastructure maintenance notice</li>
+                    <li>New message from your manager</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
