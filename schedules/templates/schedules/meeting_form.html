@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ form_mode }} Meeting - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .meeting-form-shell {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .meeting-form-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 22px;
+    padding: 26px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  .form-section-title {
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+
+  .help-text {
+    color: #64748b;
+    font-size: 0.88rem;
+    margin-top: 4px;
+  }
+
+  .errorlist {
+    color: #dc2626;
+    margin: 6px 0 0;
+    padding-left: 18px;
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">{{ form_mode }} Meeting</h2>
+  <p class="page-subtitle">Create a clear team meeting with time, location, participants, and conflict protection.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="meeting-form-shell">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="meeting-form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <h4 class="form-section-title">Meeting details</h4>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.team.id_for_label }}">Team</label>
+          {{ form.team }}
+          {{ form.team.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.title.id_for_label }}">Title</label>
+          {{ form.title }}
+          {{ form.title.errors }}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold" for="{{ form.description.id_for_label }}">Description / Agenda</label>
+          {{ form.description }}
+          {{ form.description.errors }}
+        </div>
+      </div>
+
+      <h4 class="form-section-title">Time and location</h4>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.start_datetime.id_for_label }}">Start time</label>
+          {{ form.start_datetime }}
+          {{ form.start_datetime.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.end_datetime.id_for_label }}">End time</label>
+          {{ form.end_datetime }}
+          {{ form.end_datetime.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.location.id_for_label }}">Location</label>
+          {{ form.location }}
+          {{ form.location.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.meeting_link.id_for_label }}">Meeting link</label>
+          {{ form.meeting_link }}
+          {{ form.meeting_link.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" for="{{ form.visibility.id_for_label }}">Visibility</label>
+          {{ form.visibility }}
+          {{ form.visibility.errors }}
+        </div>
+      </div>
+
+      <h4 class="form-section-title">Participants</h4>
+      <div class="row g-3 mb-4">
+        <div class="col-md-5">
+          <div class="form-check p-3 border rounded-3 bg-light">
+            {{ form.invite_whole_team }}
+            <label class="form-check-label fw-semibold ms-2" for="{{ form.invite_whole_team.id_for_label }}">
+              {{ form.invite_whole_team.label }}
+            </label>
+            <div class="help-text">{{ form.invite_whole_team.help_text }}</div>
+            {{ form.invite_whole_team.errors }}
+          </div>
+        </div>
+        <div class="col-md-7">
+          <label class="form-label fw-semibold" for="{{ form.participants.id_for_label }}">{{ form.participants.label }}</label>
+          {{ form.participants }}
+          <div class="help-text">Hold Ctrl/Cmd to choose multiple people.</div>
+          {{ form.participants.errors }}
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-top pt-4">
+        <a href="{% url 'schedules:meeting_calendar' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to Calendar
+        </a>
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-check-circle"></i> {{ form_mode }} Meeting
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

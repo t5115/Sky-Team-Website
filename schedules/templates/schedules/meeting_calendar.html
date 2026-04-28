@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Calendar - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .schedule-toolbar {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  }
+
+  .schedule-filters {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) minmax(160px, 0.9fr) minmax(160px, 0.9fr) minmax(130px, 0.7fr) auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .calendar-title {
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+  }
+
+  .calendar-weekday {
+    padding: 12px;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .calendar-day {
+    min-height: 138px;
+    padding: 10px;
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .calendar-day:nth-child(7n) { border-right: none; }
+  .calendar-day.muted { background: #f8fafc; color: #94a3b8; }
+  .calendar-day.today { background: #eff6ff; }
+
+  .day-number {
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .meeting-pill {
+    display: block;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 7px 8px;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  .meeting-pill:hover { color: #ffffff; opacity: 0.92; }
+  .meeting-time { font-weight: 800; display: block; }
+
+  .meeting-list-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  }
+
+  .meeting-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .meeting-row:last-child { border-bottom: 0; }
+  .meeting-name { margin: 0; font-weight: 800; color: #0f172a; }
+  .meeting-meta { margin: 4px 0 0; color: #64748b; font-size: 0.9rem; }
+
+  @media (max-width: 991.98px) {
+    .schedule-filters { grid-template-columns: 1fr 1fr; }
+    .calendar-grid { display: block; }
+    .calendar-weekday { display: none; }
+    .calendar-day { border-right: none; min-height: auto; }
+  }
+
+  @media (max-width: 575.98px) {
+    .schedule-filters { grid-template-columns: 1fr; }
+    .calendar-nav { flex-direction: column; align-items: stretch; }
+  }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Team Schedule Calendar</h2>
+  <p class="page-subtitle">Plan, view, and manage meetings across Sky teams.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Calendar View</span>
+    <span class="text-muted ms-2">{{ meetings|length }} meeting{{ meetings|length|pluralize }} this month</span>
+  </div>
+  {% if can_schedule %}
+    <a href="{% url 'schedules:meeting_create' %}" class="btn btn-primary">
+      <i class="bi bi-calendar-plus"></i> Schedule Meeting
+    </a>
+  {% endif %}
+</div>
+
+<section class="schedule-toolbar" aria-label="Schedule filters">
+  <form method="get" class="schedule-filters">
+    <div>
+      <label class="form-label fw-semibold">Search</label>
+      <input type="text" name="search" class="form-control" value="{{ search_query }}" placeholder="Search title, team, organizer...">
+    </div>
+    <div>
+      <label class="form-label fw-semibold">Department</label>
+      <select name="department" class="form-select">
+        <option value="">All departments</option>
+        {% for department in departments %}
+          <option value="{{ department.pk }}" {% if department_id|stringformat:"s" == department.pk|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="form-label fw-semibold">Team</label>
+      <select name="team" class="form-select">
+        <option value="">All teams</option>
+        {% for team in teams %}
+          <option value="{{ team.pk }}" {% if team_id|stringformat:"s" == team.pk|stringformat:"s" %}selected{% endif %}>{{ team.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="form-label fw-semibold">Status</label>
+      <select name="status" class="form-select">
+        <option value="scheduled" {% if status_filter == 'scheduled' %}selected{% endif %}>Scheduled</option>
+        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+      </select>
+    </div>
+    <div class="d-grid">
+      <label class="form-label fw-semibold">&nbsp;</label>
+      <button type="submit" class="btn btn-outline-primary">Apply</button>
+    </div>
+    <input type="hidden" name="year" value="{{ current_month_date.year }}">
+    <input type="hidden" name="month" value="{{ current_month_date.month }}">
+  </form>
+</section>
+
+<div class="calendar-nav">
+  <a class="btn btn-outline-secondary" href="?year={{ previous_year }}&month={{ previous_month }}&team={{ team_id }}&department={{ department_id }}&status={{ status_filter }}&search={{ search_query }}">
+    <i class="bi bi-chevron-left"></i> Previous
+  </a>
+  <h3 class="calendar-title">{{ current_month_date|date:"F Y" }}</h3>
+  <a class="btn btn-outline-secondary" href="?year={{ next_year }}&month={{ next_month }}&team={{ team_id }}&department={{ department_id }}&status={{ status_filter }}&search={{ search_query }}">
+    Next <i class="bi bi-chevron-right"></i>
+  </a>
+</div>
+
+<div class="calendar-grid" aria-label="Monthly meeting calendar">
+  <div class="calendar-weekday">Mon</div>
+  <div class="calendar-weekday">Tue</div>
+  <div class="calendar-weekday">Wed</div>
+  <div class="calendar-weekday">Thu</div>
+  <div class="calendar-weekday">Fri</div>
+  <div class="calendar-weekday">Sat</div>
+  <div class="calendar-weekday">Sun</div>
+
+  {% for week in calendar_weeks %}
+    {% for day in week %}
+      <div class="calendar-day {% if not day.in_month %}muted{% endif %} {% if day.is_today %}today{% endif %}">
+        <div class="day-number">{{ day.date|date:"j" }}</div>
+        {% for meeting in day.meetings %}
+          <a href="{% url 'schedules:meeting_detail' meeting.pk %}" class="meeting-pill">
+            <span class="meeting-time">{{ meeting.start_datetime|date:"H:i" }}</span>
+            {{ meeting.title|truncatechars:32 }}
+          </a>
+        {% empty %}
+          <span class="text-muted small">No meetings</span>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+
+<section class="meeting-list-card mt-4">
+  <h4 class="fw-bold mb-3">Meetings this month</h4>
+  {% for meeting in meetings %}
+    <div class="meeting-row">
+      <div>
+        <h5 class="meeting-name"><a href="{% url 'schedules:meeting_detail' meeting.pk %}">{{ meeting.title }}</a></h5>
+        <p class="meeting-meta">
+          <i class="bi bi-clock"></i> {{ meeting.start_datetime|date:"D, d M Y H:i" }} - {{ meeting.end_datetime|date:"H:i" }}
+          · <i class="bi bi-people"></i> {{ meeting.team.name }}
+          {% if meeting.organizer %} · <i class="bi bi-person"></i> {{ meeting.organizer }}{% endif %}
+        </p>
+      </div>
+      <span class="badge {% if meeting.status == 'scheduled' %}bg-success{% elif meeting.status == 'cancelled' %}bg-secondary{% else %}bg-info{% endif %}">{{ meeting.get_status_display }}</span>
+    </div>
+  {% empty %}
+    <div class="alert alert-info mb-0">No meetings found for this month.</div>
+  {% endfor %}
+</section>
+{% endblock %}

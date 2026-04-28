@@ -43,6 +43,9 @@ urlpatterns = [
     # organisation reports URLs
     path("reports/", include("reports.urls")),
 
+    # team scheduling and meeting calendar URLs
+    path("schedule/", include("schedules.urls")),
+
 ]
 
 

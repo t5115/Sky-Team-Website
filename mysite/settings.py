@@ -61,6 +61,9 @@ INSTALLED_APPS = [
 
     # the reports app generates organisation summary reports from existing data
     'reports',
+
+    # the schedules app allows teams to plan and manage meetings on a calendar
+    'schedules',
 ]
 
 MIDDLEWARE = [
