@@ -64,6 +64,9 @@ INSTALLED_APPS = [
 
     # the schedules app allows teams to plan and manage meetings on a calendar
     'schedules',
+
+    # the messaging app allows users to communicate through direct, group, and team conversations
+    'messaging',
 ]
 
 MIDDLEWARE = [
@@ -144,8 +147,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+   BASE_DIR / "static",
 ]
+
 
 # Where Django redirects users after successful login
 LOGIN_REDIRECT_URL = "core:home"

@@ -50,8 +50,7 @@ def request_registration_link_view(request):
                         "email": email,
                     }
                 )
-                
-                print(registration_link.replace("/n","").replace("/r",""))
+                print(registration_link.replace("\n", "").replace("\r", ""))
 
                 email_message = EmailMessage(
                     subject=subject,

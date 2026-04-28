@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - Sky Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .messages-shell { max-width: 1150px; margin: 0 auto; }
+  .messages-toolbar { display: flex; justify-content: space-between; gap: 14px; align-items: end; margin-bottom: 20px; }
+  .messages-search { flex: 1; display: flex; gap: 10px; }
+  .conversation-list { display: grid; gap: 14px; }
+  .conversation-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 18px; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05); display: grid; grid-template-columns: 1fr auto; gap: 16px; }
+  .conversation-title { margin: 0 0 6px; color: #0f172a; font-weight: 850; }
+  .conversation-meta { color: #64748b; font-size: .92rem; margin-bottom: 8px; }
+  .last-message { color: #334155; margin: 0; }
+  .unread-badge { background: #2563eb; color: #fff; border-radius: 999px; padding: 5px 10px; font-weight: 800; font-size: .8rem; }
+  .empty-state { text-align: center; padding: 44px; border: 1px dashed #cbd5e1; border-radius: 20px; color: #64748b; }
+  @media (max-width: 767.98px) { .messages-toolbar, .messages-search { flex-direction: column; align-items: stretch; } .conversation-card { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <h2 class="page-title">Messages</h2>
+  <p class="page-subtitle">Direct messages, group chats, and team conversations in one secure inbox.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="messages-shell">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="messages-toolbar">
+    <form class="messages-search" method="get">
+      <input class="form-control" type="search" name="q" value="{{ search_query }}" placeholder="Search conversations, people, or message text...">
+      {% if show_archived %}<input type="hidden" name="archived" value="1">{% endif %}
+      <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Search</button>
+      <a class="btn btn-outline-secondary" href="{% url 'messaging:inbox' %}">Reset</a>
+    </form>
+    <div class="d-flex gap-2">
+      {% if show_archived %}
+        <a class="btn btn-outline-secondary" href="{% url 'messaging:inbox' %}">Active Inbox</a>
+      {% else %}
+        <a class="btn btn-outline-secondary" href="{% url 'messaging:inbox' %}?archived=1">Archived</a>
+      {% endif %}
+      <a class="btn btn-success" href="{% url 'messaging:conversation_start' %}"><i class="bi bi-pencil-square"></i> New Message</a>
+    </div>
+  </div>
+
+  {% if conversation_cards %}
+    <div class="conversation-list">
+      {% for card in conversation_cards %}
+        <article class="conversation-card">
+          <div>
+            <h3 class="conversation-title">
+              <a href="{% url 'messaging:conversation_detail' card.conversation.pk %}">{{ card.conversation.display_title }}</a>
+            </h3>
+            <div class="conversation-meta">
+              {{ card.conversation.get_conversation_type_display }}
+              {% if card.conversation.team %} · {{ card.conversation.team.name }}{% endif %}
+              · Participants:
+              {% for participant in card.participants %}
+                {{ participant.user.username }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+            {% if card.last_message %}
+              <p class="last-message"><strong>{{ card.last_message.sender.username }}:</strong> {{ card.last_message.safe_body|truncatechars:140 }}</p>
+              <small class="text-muted">{{ card.last_message.sent_at|date:"d M Y, H:i" }}</small>
+            {% else %}
+              <p class="last-message text-muted">No messages yet.</p>
+            {% endif %}
+          </div>
+          <div class="text-end">
+            {% if card.unread_count %}<span class="unread-badge">{{ card.unread_count }} unread</span>{% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h4>No conversations found</h4>
+      <p>Start a direct message, group chat, or team chat to communicate with people inside the app.</p>
+      <a class="btn btn-primary" href="{% url 'messaging:conversation_start' %}">Start your first message</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
