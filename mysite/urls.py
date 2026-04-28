@@ -46,9 +46,6 @@ urlpatterns = [
     # team scheduling and meeting calendar URLs
     path("schedule/", include("schedules.urls")),
 
-    # internal messaging URLs
-    path("messages/", include("messaging.urls")),
-
 ]
 
 

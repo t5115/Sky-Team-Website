@@ -64,9 +64,6 @@ INSTALLED_APPS = [
 
     # the schedules app allows teams to plan and manage meetings on a calendar
     'schedules',
-
-    # the messaging app allows users to communicate through direct, group, and team conversations
-    'messaging',
 ]
 
 MIDDLEWARE = [
